@@ -21,7 +21,7 @@
         
                  <div class="mb-3" >
                     <label for="image" class="form-label">Upload Image</label>
-                    <input  name="listing[image]" type="file" class="form-control" required>
+                    <input  name="listing[image]" type="file" class="form-control">
                 </div>
 
                 <div class="row">
@@ -38,11 +38,29 @@
                     </div>
                 </div>
                 
-
                 <div class="mb-3">
                     <label for="location" class="form-label">Location</label>
                     <input placeholder="Enter Location" name="listing[location]" type="text" class="form-control" required>
                     <div class="invalid-feedback">Please Enter Location</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select name="listing[category]" class="form-control" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="Trending">Trending</option>
+                        <option value="Rooms">Rooms</option>
+                        <option value="Iconic cities">Iconic cities</option>
+                        <option value="Mountains">Mountains</option>
+                        <option value="Castles">Castles</option>
+                        <option value="Amazing Pools">Amazing Pools</option>
+                        <option value="Camping">Camping</option>
+                        <option value="Farms">Farms</option>
+                        <option value="Arctic">Arctic</option>
+                        <option value="Boats">Boats</option>
+                        <option value="Domes">Domes</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a category</div>
                 </div>
         
                 <br><br>
@@ -54,5 +72,4 @@
     </div>
     
 </body>
-</html>
 <script src="/js/map.js"></script>
