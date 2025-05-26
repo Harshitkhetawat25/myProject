@@ -19,7 +19,7 @@
         font-size: 0.8rem;
     }
     .tax-info {
-         display: none;
+        display: none;
     }
     .tax-toggle {
         border: 1px solid black;
@@ -27,7 +27,7 @@
         height: 3.5rem;
         padding: 1rem;
         margin-left: 3rem;
-        display:flex;
+        display: flex;
         align-items: center;
     }
     .active-filter {
@@ -38,8 +38,18 @@
         text-decoration: none;
         color: inherit;
     }
+    .search-results {
+        margin: 1rem 0;
+        font-size: 1.1rem;
+    }
 </style>
 <body>
+    <% if (query) { %>
+        <div class="search-results">
+            <h5>Search results for "<%= query %>"</h5>
+        </div>
+    <% } %>
+
     <div id="filters">
         <div class="filter <%= !activeCategory ? 'active-filter' : '' %>">
             <a href="/listings"><i class="fa-solid fa-list"></i></a>
@@ -98,20 +108,24 @@
     </div>
 
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
-        <% for(let listing of allListings){ %>
-            <a href="/listings/<%=listing._id%>" class="listing-link">
-                <div class="card col listing-card">
-                    <img src="<%= listing.image.url || 'https://via.placeholder.com/300' %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
-                    <div class="card-img-overlay"></div>
-                    <div class="card-body">
-                      <p class="card-text"> 
-                        <b><%= listing.title %></b> <br>
-                        ₹ <%= listing.price.toLocaleString("en-IN") %> / night
-                        <i class="tax-info"> +18% GST</i>
-                      </p>
+        <% if (allListings.length === 0) { %>
+            <p>No listings found matching your search.</p>
+        <% } else { %>
+            <% for(let listing of allListings){ %>
+                <a href="/listings/<%=listing._id%>" class="listing-link">
+                    <div class="card col listing-card">
+                        <img src="<%= listing.image.url || 'https://via.placeholder.com/300' %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-body">
+                          <p class="card-text"> 
+                            <b><%= listing.title %></b> <br>
+                            ₹ <%= listing.price.toLocaleString("en-IN") %> / night
+                            <i class="tax-info"> +18% GST</i>
+                          </p>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+            <% } %>
         <% } %>
     </div>
 </body>

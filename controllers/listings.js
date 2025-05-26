@@ -5,7 +5,7 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings, activeCategory: null });
+    res.render("listings/index.ejs", { allListings, activeCategory: null, query: null });
 };
 
 module.exports.renderNewForm = (req, res) => {
@@ -98,5 +98,24 @@ module.exports.filterByCategory = async (req, res) => {
         return res.redirect("/listings");
     }
     const allListings = await Listing.find({ category });
-    res.render("listings/index.ejs", { allListings, activeCategory: category });
+    res.render("listings/index.ejs", { allListings, activeCategory: category, query: null });
+};
+
+module.exports.searchListings = async (req, res) => {
+    const { query } = req.query;
+    if (!query || query.trim() === "") {
+        req.flash("error", "Please enter a search term");
+        return res.redirect("/listings");
+    }
+    const regex = new RegExp(query.trim(), "i");
+    const allListings = await Listing.find({
+        $or: [
+            { title: regex },
+            { description: regex },
+            { location: regex },
+            { country: regex },
+            { category: regex }
+        ]
+    });
+    res.render("listings/index.ejs", { allListings, activeCategory: null, query });
 };

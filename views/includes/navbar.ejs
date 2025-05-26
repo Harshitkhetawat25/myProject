@@ -3,49 +3,105 @@
     background-color: #fe424d;
     color: #fff;
     border-radius: 25px;
-    padding: 0 1rem 0 1rem;
+    padding: 8px 16px;
   }
-  .btn-search:hover {
+  .navbar .btn-search:hover {
     background-color: #fe424d;
     color: #fff;
   }
-  .btn-search i {
+  .navbar .btn-search i {
     display: inline;
     margin-right: 0.5rem;
-
   }
-  .search-input {
+  .navbar .search-input {
     border-radius: 25px;
     padding: 0.5rem 3rem 0.5rem 3rem;
+  }
+  /* Mobile dropdown styles */
+  @media (max-width: 767.98px) {
+    .navbar-collapse {
+      background-color: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+      position: relative; /* Ensure it stays in document flow */
+      z-index: 1000; /* Ensure it’s above other content */
+    }
+    .navbar-collapse.show {
+      display: block; /* Ensure it takes space when open */
+      height: auto; /* Allow natural height */
+    }
+    .navbar-nav {
+      flex-direction: column; /* Stack items vertically */
+      align-items: flex-start; /* Align to the left */
+    }
+    .navbar-nav .nav-link {
+      padding: 0.5rem 0; /* Add spacing between items */
+    }
+    .navbar-nav.ms-auto {
+      margin-top: 0.5rem; /* Space between nav groups */
+    }
+    .navbar form.d-flex {
+      width: 100%; /* Full width for search form */
+      margin: 0.5rem 0; /* Add spacing */
+    }
+    .navbar .search-input {
+      width: 100%; /* Full width input */
+    }
+    /* Push content down when dropdown is open */
+    .navbar-expanded + .container, 
+    .navbar-expanded + main, 
+    .navbar-expanded + div {
+      margin-top: 10rem; /* Adjust based on dropdown height */
+      transition: margin-top 0.3s ease; /* Smooth transition */
+    }
   }
 </style>
 <nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-link" href="/listings">Explore</a>
-        
       </div>
       <div class="navbar-nav ms-auto">
-      <form class="d-flex" role="search">
-          <input class="form-control me-2 search-input" type="search" placeholder="Search destination" aria-label="Search"/>
-           <button class="btn btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
-      </form>
+        <form class="d-flex" role="search" action="/listings/search" method="GET">
+          <input class="form-control me-2 search-input" type="search" name="query" placeholder="Search destination" aria-label="Search" value="<%= typeof query !== 'undefined' ? query : '' %>"/>
+          <button class="btn btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
+        </form>
       </div>
       <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">WanderWhirl Your Home</a>
+        <a class="nav-link" href="/listings/new">Your Home</a>
         <% if(!currUser){ %>        
-        <a class="nav-link " href="/signup"><b>SignUp</b></a>
-        <a class="nav-link" href="/login"><b>Login</b></a>
+          <a class="nav-link" href="/signup"><b>SignUp</b></a>
+          <a class="nav-link" href="/login"><b>Login</b></a>
         <% } %>
         <% if(currUser){ %>
-        <a class="nav-link" href="/logout">Logout</a>
+          <a class="nav-link" href="/logout">Logout</a>
         <% } %>
       </div>
     </div>
   </div>
 </nav>
+<script>
+  // Add/remove navbar-expanded class to body when toggler is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggler = document.querySelector('.navbar-toggler');
+    const collapse = document.querySelector('.navbar-collapse');
+    toggler.addEventListener('click', () => {
+      if (collapse.classList.contains('show')) {
+        document.body.classList.remove('navbar-expanded');
+      } else {
+        document.body.classList.add('navbar-expanded');
+      }
+    });
+    // Remove class when collapse is hidden
+    collapse.addEventListener('hidden.bs.collapse', () => {
+      document.body.classList.remove('navbar-expanded');
+    });
+  });
+</script>
