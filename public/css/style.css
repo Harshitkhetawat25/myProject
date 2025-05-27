@@ -15,29 +15,31 @@ body {
 }
 
 .fa-compass {
-    color : #fe424d;
+    color: #fe424d;
     font-size: 2rem;
 }
+
 .nav-link {
-    color : #222222 !important;
+    color: #222222 !important;
 }
-.f-info-links, .f-info-socials, .f-info-brand {
+
+.f-info-links,
+.f-info-socials,
+.f-info-brand {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-
- 
 .f-info-socials i {
     margin: 0.5rem;
     font-size: 1.2rem;
 }
 
-.f-info-links a { 
+.f-info-links a {
     text-decoration: none;
-    color: #222222;  
+    color: #222222;
 }
 
 .f-info-links a:hover {
@@ -51,34 +53,42 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: space-evenly;
-   
+    align-items: center;
+    width: 100%;
 }
 
 .listing-card {
     border: none !important;
     margin-bottom: 2rem;
-
+    transition: transform 0.2s ease; /* Smooth hover/tap effect */
 }
 
-.card-img-top{
+.listing-card:hover {
+    transform: scale(1.02); /* Subtle scale on hover */
+}
+
+.card-img-top {
     border-radius: 1rem !important;
     width: 100% !important;
     object-fit: cover !important;
+    height: 20rem;
 }
+
 .card-body {
     padding: 0 !important;
-
 }
+
 .card-text p {
     font-weight: 400 !important;
 }
-.listing-link { 
+
+.listing-link {
     text-decoration: none;
 }
 
 .card-img-overlay {
     opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .card-img-overlay:hover {
@@ -86,32 +96,188 @@ body {
     background-color: white;
 }
 
-.add-btn {
-    background-color:  #fe424d !important;
-    border: none;
+.add-btn,
+.edit-btn,
+.del-btn {
+    background-color: #fe424d !important;
+    border: none !important;
+    transition: transform 0.2s ease; /* Smooth tap feedback */
 }
 
-.edit-btn {
-    background-color:  #fe424d !important;
-    border: none !important;
+.add-btn:hover,
+.edit-btn:hover,
+.del-btn:hover {
+    transform: scale(1.05); /* Subtle tap effect */
 }
 
 .show-img {
-    height:30vh ;
+    height: 30vh;
 }
 
 .btns {
     display: flex;
+    gap: 1rem;
 }
 
 .show-card {
     padding-left: 0;
     padding-right: 0;
+    box-shadow: none /* Subtle shadow for premium look */
 }
 
 /* Map */
-
 #map {
-  height: 400px;
-  width: 80vh;
+    height: 400px;
+    width: 35vw;
+    margin-right: auto; /* Center map */
+    border-radius: 8px; /* Subtle rounding */
+}
+
+/* Mobile Styles */
+@media (max-width: 767.98px) {
+    .navbar {
+        height: auto;
+        padding: 0.5rem;
+    }
+
+    .container {
+        padding: 0.5rem;
+    }
+
+    .f-info {
+        height: auto;
+        padding: 1rem 0;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .f-info-socials i {
+        font-size: 1rem;
+        margin: 0.3rem;
+    }
+
+    .f-info-links a {
+        font-size: 0.9rem;
+        margin: 0 0.5rem;
+    }
+
+    .card-img-top {
+        height: 15rem; /* Reduced height for mobile */
+    }
+
+    .show-img {
+        height: 20vh; /* Adjusted for mobile */
+        object-fit: cover;
+    }
+
+    #map {
+        width: 100%; /* Full width on mobile */
+        height: 200px; /* Smaller height */
+        margin: 0 auto; /* Ensure centered */
+    }
+
+    .btns {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .add-btn,
+    .edit-btn,
+    .del-btn {
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Form adjustments */
+    .form-control,
+    .form-select {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .col-8.offset-2,
+    .col-6.offset-3 {
+        width: 100%;
+        margin: 0;
+        padding: 0 0.5rem;
+    }
+
+    /* Show page specific */
+    .show-card {
+        margin: 0 auto; /* Center card */
+        padding: 0.5rem;
+        width: 100%; /* Full width */
+    }
+
+    .card.col-5.ms-3.mb-3 {
+        width: 100%; /* Full width for reviews */
+        margin-left: 0; /* Remove left margin */
+        margin-bottom: 0.8rem;
+        padding: 0.5rem; /* Consistent padding */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .needs-validation {
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .show-page .row.mt-3 {
+        margin-top: 0.5rem !important;
+    }
+
+    .show-page h3 {
+        font-size: 1.2rem;
+    }
+
+    .show-page h4 {
+        font-size: 1rem;
+    }
+
+    .show-page h5 {
+        font-size: 0.9rem;
+    }
+
+    .show-page .btn-dark,
+    .show-page .btn-outline-dark {
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .show-page .card-title {
+        font-size: 0.9rem;
+    }
+
+    .show-page .card-text {
+        font-size: 0.8rem;
+    }
+
+    .show-page .card-footer {
+        font-size: 0.7rem;
+    }
+
+    /* Center buttons */
+    .edit-btn,
+    .del-btn {
+        margin: 0.5rem 0;
+    }
+
+    .offset-3,
+    .offset-5 {
+        margin-left: 0; /* Remove offsets on mobile */
+    }
+
+    .col-8.offset-3,
+    .col-6.offset-3 {
+        width: 100%;
+        margin: 0;
+        padding: 0 0.5rem;
+    }
 }

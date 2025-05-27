@@ -2,14 +2,18 @@
 <style>
     #filters {
         display: flex;
-        flex-wrap: nowrap;
+        flex-wrap: wrap; /* Changed from nowrap to wrap for mobile */
         align-items: center;
+        gap: 1rem; /* Added gap for better spacing */
+        padding: 0.5rem;
+        overflow-x: auto; /* Horizontal scroll for mobile */
+        white-space: nowrap; /* Prevent text wrapping in filters */
     }
     .filter {
         text-align: center;
-        margin-left: 2rem;
-        margin-top: 2rem;
+        margin: 0.5rem; /* Reduced margin */
         opacity: 0.7;
+        flex: 0 0 auto; /* Prevent filters from stretching */
     }
     .filter:hover {
         opacity: 1;
@@ -17,6 +21,7 @@
     }
     .filter p {
         font-size: 0.8rem;
+        margin: 0.2rem 0;
     }
     .tax-info {
         display: none;
@@ -24,11 +29,11 @@
     .tax-toggle {
         border: 1px solid black;
         border-radius: 1rem;
-        height: 3.5rem;
-        padding: 1rem;
-        margin-left: 3rem;
+        height: 3rem;
+        padding: 0.5rem;
         display: flex;
         align-items: center;
+        flex: 0 0 auto;
     }
     .active-filter {
         opacity: 1;
@@ -42,6 +47,45 @@
         margin: 1rem 0;
         font-size: 1.1rem;
     }
+    /* Filter toggle button for mobile */
+    #filter-toggle {
+        display: none;
+        background-color: #fe424d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        margin: 0.5rem;
+        cursor: pointer;
+    }
+    /* Mobile styles */
+    @media (max-width: 767.98px) {
+        #filters {
+            display: none; /* Hidden by default on mobile */
+            justify-content: flex-start;
+            padding: 0.5rem;
+        }
+        #filters.show {
+            display: flex; /* Shown when toggled */
+        }
+        .filter {
+            margin: 0.3rem;
+        }
+        .filter i {
+            font-size: 1rem; /* Smaller icons */
+        }
+        .filter p {
+            font-size: 0.7rem; /* Smaller text */
+        }
+        .tax-toggle {
+            height: 2.5rem;
+            padding: 0.3rem;
+            font-size: 0.8rem;
+        }
+        #filter-toggle {
+            display: block; /* Show toggle button on mobile */
+        }
+    }
 </style>
 <body>
     <% if (query) { %>
@@ -50,6 +94,7 @@
         </div>
     <% } %>
 
+    <button id="filter-toggle" onclick="toggleFilters()">Show Filters</button>
     <div id="filters">
         <div class="filter <%= !activeCategory ? 'active-filter' : '' %>">
             <a href="/listings"><i class="fa-solid fa-list"></i></a>
@@ -101,8 +146,8 @@
         </div>
         <div class="tax-toggle">
             <div class="form-check-reverse form-switch">
-               <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-               <label class="form-check-label" for="flexSwitchCheckDefault">Display total after Taxes</label>
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Display total after Taxes</label>
             </div>
         </div>
     </div>
@@ -114,14 +159,14 @@
             <% for(let listing of allListings){ %>
                 <a href="/listings/<%=listing._id%>" class="listing-link">
                     <div class="card col listing-card">
-                        <img src="<%= listing.image.url || 'https://via.placeholder.com/300' %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
+                        <img src="<%= listing.image.url || 'https://via.placeholder.com/300' %>" class="card-img-top" alt="listing_image">
                         <div class="card-img-overlay"></div>
                         <div class="card-body">
-                          <p class="card-text"> 
-                            <b><%= listing.title %></b> <br>
-                            ₹ <%= listing.price.toLocaleString("en-IN") %> / night
-                            <i class="tax-info"> +18% GST</i>
-                          </p>
+                            <p class="card-text"> 
+                                <b><%= listing.title %></b> <br>
+                                ₹ <%= listing.price.toLocaleString("en-IN") %> / night
+                                <i class="tax-info"> +18% GST</i>
+                            </p>
                         </div>
                     </div>
                 </a>
@@ -137,4 +182,11 @@
             info.style.display = info.style.display !== "inline" ? "inline" : "none";
         }
     });
+
+    function toggleFilters() {
+        const filters = document.getElementById("filters");
+        filters.classList.toggle("show");
+        const toggleButton = document.getElementById("filter-toggle");
+        toggleButton.textContent = filters.classList.contains("show") ? "Hide Filters" : "Show Filters";
+    }
 </script>

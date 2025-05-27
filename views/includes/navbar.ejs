@@ -20,41 +20,44 @@
   /* Mobile dropdown styles */
   @media (max-width: 767.98px) {
     .navbar-collapse {
-      background-color: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
-      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 0.5rem;
       border-radius: 8px;
       margin-top: 0.5rem;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-      position: relative; /* Ensure it stays in document flow */
-      z-index: 1000; /* Ensure it’s above other content */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 1000;
     }
     .navbar-collapse.show {
-      display: block; /* Ensure it takes space when open */
-      height: auto; /* Allow natural height */
+      display: block;
+      height: auto;
     }
     .navbar-nav {
-      flex-direction: column; /* Stack items vertically */
-      align-items: flex-start; /* Align to the left */
+      flex-direction: column;
+      align-items: flex-start;
     }
     .navbar-nav .nav-link {
-      padding: 0.5rem 0; /* Add spacing between items */
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
     }
     .navbar-nav.ms-auto {
-      margin-top: 0.5rem; /* Space between nav groups */
+      margin-top: 0.5rem;
     }
     .navbar form.d-flex {
-      width: 100%; /* Full width for search form */
-      margin: 0.5rem 0; /* Add spacing */
+      width: 100%;
+      margin: 0.5rem 0;
     }
     .navbar .search-input {
-      width: 100%; /* Full width input */
+      width: 100%;
+      font-size: 0.9rem;
+      padding: 0.5rem 2rem;
     }
-    /* Push content down when dropdown is open */
-    .navbar-expanded + .container, 
-    .navbar-expanded + main, 
+    /* Adjusted margin to avoid overlap with filters */
+    .navbar-expanded + .container,
+    .navbar-expanded + main,
     .navbar-expanded + div {
-      margin-top: 10rem; /* Adjust based on dropdown height */
-      transition: margin-top 0.3s ease; /* Smooth transition */
+      margin-top: 6rem;
+      transition: margin-top 0.3s ease;
     }
   }
 </style>
@@ -88,7 +91,6 @@
   </div>
 </nav>
 <script>
-  // Add/remove navbar-expanded class to body when toggler is clicked
   document.addEventListener('DOMContentLoaded', () => {
     const toggler = document.querySelector('.navbar-toggler');
     const collapse = document.querySelector('.navbar-collapse');
@@ -99,7 +101,6 @@
         document.body.classList.add('navbar-expanded');
       }
     });
-    // Remove class when collapse is hidden
     collapse.addEventListener('hidden.bs.collapse', () => {
       document.body.classList.remove('navbar-expanded');
     });
