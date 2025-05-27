@@ -1,3 +1,4 @@
+const mongoose = require("mongoose"); // Added for ObjectId validation
 const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const ExpressError = require("./utils/ExpressError.js");
@@ -51,7 +52,14 @@ module.exports.validateReview = (req, res, next) => {
 
 module.exports.isReviewAuthor = async (req, res, next) => {
     let { id, reviewId } = req.params;
+    // console.log("Review ID:", reviewId); // Debug log (uncomment for troubleshooting)
+    if (!mongoose.isValidObjectId(reviewId)) {
+        // console.log("Invalid review ID format"); // Debug log
+        req.flash("error", "Invalid review ID");
+        return res.redirect(`/listings/${id}`);
+    }
     let review = await Review.findById(reviewId);
+    // console.log("Review found:", review); // Debug log
     if (!review) {
         req.flash("error", "Review not found");
         return res.redirect(`/listings/${id}`);
