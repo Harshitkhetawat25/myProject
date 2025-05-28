@@ -42,6 +42,12 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+// Log all incoming requests for debugging
+app.use((req, res, next) => {
+    console.log("Request:", req.method, req.path);
+    next();
+});
+
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     crypto: {
@@ -86,11 +92,17 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/user.js");
 
+// Root route
+app.get("/", (req, res) => {
+    console.log("Root route accessed");
+    res.redirect("/listings");
+});
+
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-app.all(/.*/, (req, res, next) => {
+app.all("*", (req, res, next) => {
     console.log("404 - Requested Path:", req.path, "Method:", req.method);
     next(new ExpressError(404, "Page Not Found!"));
 });
@@ -107,13 +119,13 @@ app.use((err, req, res, next) => {
     let statusCode = err.statusCode || 500;
     let message = err.message || "Something went wrong!";
     if (err.name === "CastError" && err.kind === "ObjectId") {
-        statusCode = 400;
+        statusCode = 400";
         message = "Invalid ID format";
-    } else if (err.name === "MulterError" && err.code === "LIMIT_UNEXPECTED_FILE") {
+    } else if (err.name === "MulterError") {
         statusCode = 400;
         message = "Invalid file upload field. Please use the correct file input.";
     } else if (err.name === "ValidationError") {
-        statusCode = 400;
+        statusCode = 400";
         message = "Invalid data: " + Object.values(err.errors).map(e => e.message).join(", ");
     }
     res.status(statusCode).render("error.ejs", { err: { message, statusCode } });
