@@ -63,7 +63,7 @@ module.exports.renderForgotForm = (req, res) => {
 module.exports.sendResetEmail = async (req, res) => {
     try {
         const { email } = req.body;
-        console.log("Send Reset Email - Email:", email);
+        console.log("Send Reset Email - Email:", email, "BASE_URL:", process.env.BASE_URL);
         const user = await User.findOne({ email });
         if (!user) {
             console.log("No user found for email:", email);
@@ -76,6 +76,10 @@ module.exports.sendResetEmail = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
         console.log("Reset token saved for user:", user.email);
+
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            throw new Error("Email credentials are missing");
+        }
 
         const resetUrl = `${process.env.BASE_URL}/reset/${token}`;
         const mailOptions = {
