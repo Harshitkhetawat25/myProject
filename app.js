@@ -102,7 +102,7 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-app.all(/.*/, (req, res, next) => {
+app.all("*", (req, res, next) => {
     console.log("404 - Requested Path:", req.path, "Method:", req.method);
     next(new ExpressError(404, "Page Not Found!"));
 });
@@ -119,13 +119,13 @@ app.use((err, req, res, next) => {
     let statusCode = err.statusCode || 500;
     let message = err.message || "Something went wrong!";
     if (err.name === "CastError" && err.kind === "ObjectId") {
-        statusCode = 400";
+        statusCode = 400;
         message = "Invalid ID format";
     } else if (err.name === "MulterError") {
         statusCode = 400;
         message = "Invalid file upload field. Please use the correct file input.";
     } else if (err.name === "ValidationError") {
-        statusCode = 400";
+        statusCode = 400;
         message = "Invalid data: " + Object.values(err.errors).map(e => e.message).join(", ");
     }
     res.status(statusCode).render("error.ejs", { err: { message, statusCode } });
