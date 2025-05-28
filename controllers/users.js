@@ -17,12 +17,12 @@ module.exports.signupUser = async (req, res, next) => {
             const errMsg = error.details.map(el => el.message).join(", ");
             console.log("Validation error:", errMsg);
             req.flash("error", errMsg);
-            return res.redirect("/signup");
+            return res.redirect("/register");
         }
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             req.flash("error", "Username or email already exists");
-            return res.redirect("/signup");
+            return res.redirect("/register");
         }
         const newUser = new User({ username, email });
         const registeredUser = await User.register(newUser, password);
@@ -34,7 +34,7 @@ module.exports.signupUser = async (req, res, next) => {
     } catch (e) {
         console.error("Signup error:", e.message);
         req.flash("error", e.message);
-        res.redirect("/signup");
+        res.redirect("/register");
     }
 };
 
@@ -63,7 +63,11 @@ module.exports.renderForgotForm = (req, res) => {
 module.exports.sendResetEmail = async (req, res) => {
     try {
         const { email } = req.body;
-        console.log("Send Reset Email - Email:", email, "BASE_URL:", process.env.BASE_URL);
+        const protocol = req.protocol || "https";
+        const host = req.get("host") || process.env.HOST || "localhost:8080";
+        const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
+        console.log("Send Reset Email - Email:", email, "BASE_URL:", baseUrl);
+
         const user = await User.findOne({ email });
         if (!user) {
             console.log("No user found for email:", email);
@@ -75,13 +79,13 @@ module.exports.sendResetEmail = async (req, res) => {
         user.resetPasswordToken = token;
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
-        console.log("Reset token saved for user:", user.email);
+        console.log("Reset token saved for user:", user.email, "Token:", token);
 
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             throw new Error("Email credentials are missing");
         }
 
-        const resetUrl = `${process.env.BASE_URL}/reset/${token}`;
+        const resetUrl = `${baseUrl}/reset/${token}`;
         const mailOptions = {
             to: user.email,
             from: process.env.EMAIL_USER,
@@ -109,7 +113,7 @@ module.exports.sendResetEmail = async (req, res) => {
 
 module.exports.renderResetForm = async (req, res) => {
     const { token } = req.params;
-    console.log("Render Reset Form - Token:", token);
+    console.log("Render Reset Form - Token:", token, "Path:", req.path);
     const user = await User.findOne({
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() }
@@ -126,7 +130,7 @@ module.exports.resetPassword = async (req, res) => {
     try {
         const { token } = req.params;
         const { password } = req.body;
-        console.log("Reset Password - Token:", token);
+        console.log("Reset Password - Token:", token, "Path:", req.path);
         const user = await User.findOne({
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }

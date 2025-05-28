@@ -7,6 +7,12 @@ const userController = require("../controllers/users.js");
 router.get("/register", userController.renderSignupForm);
 router.post("/register", wrapAsync(userController.signupUser));
 
+// Redirect /signup to /register
+router.get("/signup", (req, res) => {
+    console.log("Redirecting /signup to /register");
+    res.redirect("/register");
+});
+
 router.get("/login", userController.renderLoginForm);
 router.post(
     "/login",
@@ -22,7 +28,6 @@ router.get("/logout", userController.logoutUser);
 router.get("/forgot-password", userController.renderForgotForm);
 router.post("/forgot-password", wrapAsync(userController.sendResetEmail));
 
-// Handle both /reset/:token and /reset-password/:token
 router.get(["/reset/:token", "/reset-password/:token"], wrapAsync(userController.renderResetForm));
 router.post(["/reset/:token", "/reset-password/:token"], wrapAsync(userController.resetPassword));
 

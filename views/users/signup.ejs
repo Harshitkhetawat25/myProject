@@ -31,7 +31,17 @@
 <div class="row mt-3">
     <div class="col-6 offset-3">
         <h1 class="col-6 offset-3">SignUp on WanderWhirl</h1>
-        <form action="/signup" method="POST" class="needs-validation" novalidate>
+        <% if (error && error.length) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
+        <% } %>
+        <% if (success && success.length) { %>
+            <div class="alert alert-success" role="alert">
+                <%= success %>
+            </div>
+        <% } %>
+        <form action="/register" method="POST" class="needs-validation" novalidate>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" name="username" id="username" class="form-control" required>
@@ -53,13 +63,13 @@
                     <div class="password-feedback" id="number">One number</div>
                 </div>
             </div>
-            <button class="btn btn-dark" disabled>SignUp</button>
+            <button class="btn btn-dark" disabled>Sign Up</button>
         </form>
     </div>
 </div>
 
 <script>
-    console.log("Signup form script loaded"); // Debug log
+    console.log("Signup form script loaded");
     const passwordInput = document.getElementById('password');
     const lengthFeedback = document.getElementById('length');
     const uppercaseFeedback = document.getElementById('uppercase');
@@ -70,39 +80,33 @@
 
     function validatePassword() {
         const password = passwordInput.value;
-        console.log("Password input:", password); // Debug log
+        console.log("Password input:", password);
 
-        // Check length
         const isLengthValid = password.length >= 8;
         lengthFeedback.classList.toggle('valid', isLengthValid);
         lengthFeedback.textContent = isLengthValid ? '✓ At least 8 characters' : 'At least 8 characters';
 
-        // Check uppercase
         const isUppercaseValid = /[A-Z]/.test(password);
         uppercaseFeedback.classList.toggle('valid', isUppercaseValid);
         uppercaseFeedback.textContent = isUppercaseValid ? '✓ One uppercase letter' : 'One uppercase letter';
 
-        // Check lowercase
         const isLowercaseValid = /[a-z]/.test(password);
         lowercaseFeedback.classList.toggle('valid', isLowercaseValid);
         lowercaseFeedback.textContent = isLowercaseValid ? '✓ One lowercase letter' : 'One lowercase letter';
 
-        // Check number
         const isNumberValid = /\d/.test(password);
         numberFeedback.classList.toggle('valid', isNumberValid);
         numberFeedback.textContent = isNumberValid ? '✓ One number' : 'One number';
 
-        // Enable/disable submit button
         const isValid = isLengthValid && isUppercaseValid && isLowercaseValid && isNumberValid;
         submitButton.disabled = !isValid;
-        console.log("Form valid:", isValid); // Debug log
+        console.log("Form valid:", isValid);
     }
 
     passwordInput.addEventListener('input', validatePassword);
 
-    // Bootstrap validation
     form.addEventListener('submit', (event) => {
-        console.log("Form submit attempted"); // Debug log
+        console.log("Form submit attempted");
         if (!form.checkValidity() || submitButton.disabled) {
             event.preventDefault();
             event.stopPropagation();
@@ -110,6 +114,5 @@
         form.classList.add('was-validated');
     });
 
-    // Initial validation
     validatePassword();
 </script>

@@ -1,9 +1,9 @@
 require("dotenv").config({ path: require("path").resolve(__dirname, ".env") });
 console.log("MAP_TOKEN:", process.env.MAP_TOKEN ? "Loaded" : "Missing");
 console.log("EMAIL_USER:", process.env.EMAIL_USER ? "Loaded" : "Missing");
-console.log("BASE_URL:", process.env.BASE_URL || "Not set");
-if (!process.env.MAP_TOKEN || !process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.BASE_URL) {
-    throw new Error("Missing required .env variables: MAP_TOKEN, EMAIL_USER, EMAIL_PASS, or BASE_URL");
+console.log("BASE_URL:", process.env.BASE_URL || "Dynamic via request headers");
+if (!process.env.MAP_TOKEN || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    throw new Error("Missing required .env variables: MAP_TOKEN, EMAIL_USER, or EMAIL_PASS");
 }
 
 const express = require("express");
@@ -91,7 +91,7 @@ app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
 app.all(/.*/, (req, res, next) => {
-    console.log("404 - Requested Path:", req.path);
+    console.log("404 - Requested Path:", req.path, "Method:", req.method);
     next(new ExpressError(404, "Page Not Found!"));
 });
 
