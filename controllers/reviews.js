@@ -2,29 +2,37 @@ const Listing = require("../models/listing");
 const Review = require("../models/review");
 
 module.exports.createReview = async (req, res) => {
-    let listing = await Listing.findById(req.params.id);
-    if (!listing) {
-        req.flash("error", "Listing not found");
-        return res.redirect("/listings");
+    try {
+        const { id } = req.params;
+        const listing = await Listing.findById(id);
+        const { review } = req.body;
+        const newReview = new Review(review);
+        newReview.author = req.user._id;
+        listing.reviews.push(newReview);
+
+        await newReview.save();
+        await listing.save();
+
+        req.flash("success", "Review added successfully!");
+        res.redirect(`/listings/${id}`);
+    } catch (e) {
+        console.error("Create review error:", e.message);
+        req.flash("error", "Failed to add review. Please try again.");
+        res.redirect(`/listings/${req.params.id}`);
     }
-    let newReview = new Review(req.body.review);
-    newReview.author = req.user._id;
-    listing.reviews.push(newReview);
-    await listing.save();
-    await newReview.save();
-    req.flash("success", "New Review Added Successfully");
-    res.redirect(`/listings/${listing._id}`);
 };
 
-module.exports.destroyReview = async (req, res) => {
-    let { id, reviewId } = req.params;
-    const review = await Review.findById(reviewId);
-    if (!review) {
-        req.flash("error", "Review already deleted or not found");
-        return res.redirect(`/listings/${id}`);
+module.exports.deleteReview = async (req, res) => {
+    try {
+        const { id, reviewId } = req.params;
+        await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+        await Review.findByIdAndDelete(reviewId);
+
+        req.flash("success", "Review deleted successfully!");
+        res.redirect(`/listings/${id}`);
+    } catch (e) {
+        console.error("Delete review error:", e.message);
+        req.flash("error", "Failed to delete review. Please try again.");
+        res.redirect(`/listings/${req.params.id}`);
     }
-    await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    req.flash("success", "Review Deleted Successfully");
-    res.redirect(`/listings/${id}`);
 };

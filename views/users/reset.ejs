@@ -8,48 +8,42 @@
     .password-feedback.valid {
         color: #28a745;
     }
-    .forgot-link {
+    .form-control {
         font-size: 0.9rem;
-        color: #fe424d;
-        text-decoration: none;
     }
-    .forgot-link:hover {
-        text-decoration: underline;
+    .form-label {
+        font-size: 0.9rem;
+    }
+    .btn-dark {
+        background-color: #fe424d;
+        border: none;
     }
     @media (max-width: 767.98px) {
         .password-feedback {
             font-size: 0.7rem;
         }
         .form-control {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             padding: 0.5rem;
         }
         .form-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
         .col-6.offset-3 {
             padding: 0 0.5rem;
         }
         .btn-dark {
             padding: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .forgot-link {
             font-size: 0.8rem;
         }
     }
 </style>
 <div class="row mt-3">
     <div class="col-6 offset-3">
-        <h1 class="col-6 offset-3">Login on WanderWhirl</h1>
-        <form action="/login" method="POST" class="needs-validation" novalidate>
+        <h1 class="col-6 offset-3">Reset Password</h1>
+        <form action="/reset-password/<%= token %>" method="POST" class="needs-validation" novalidate>
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" name="username" id="username" class="form-control" required>
-                <div class="invalid-feedback">Please enter a username</div>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">New Password</label>
                 <input type="password" name="password" id="password" class="form-control" required>
                 <div class="invalid-feedback">Please enter a password</div>
                 <div id="passwordFeedback">
@@ -59,16 +53,13 @@
                     <div class="password-feedback" id="number">One number</div>
                 </div>
             </div>
-            <button class="btn btn-dark">Login</button>
+            <button class="btn btn-dark" disabled>Reset Password</button>
         </form>
-        <div class="mt-2 text-center">
-            <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
-        </div>
     </div>
 </div>
 
 <script>
-    console.log("Login form script loaded");
+    console.log("Reset password form script loaded");
     const passwordInput = document.getElementById('password');
     const lengthFeedback = document.getElementById('length');
     const uppercaseFeedback = document.getElementById('uppercase');
@@ -96,13 +87,17 @@
         const isNumberValid = /\d/.test(password);
         numberFeedback.classList.toggle('valid', isNumberValid);
         numberFeedback.textContent = isNumberValid ? '✓ One number' : 'One number';
+
+        const isValid = isLengthValid && isUppercaseValid && isLowercaseValid && isNumberValid;
+        submitButton.disabled = !isValid;
+        console.log("Form valid:", isValid);
     }
 
     passwordInput.addEventListener('input', validatePassword);
 
     form.addEventListener('submit', (event) => {
         console.log("Form submit attempted");
-        if (!form.checkValidity()) {
+        if (!form.checkValidity() || submitButton.disabled) {
             event.preventDefault();
             event.stopPropagation();
         }

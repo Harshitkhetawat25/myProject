@@ -1,4 +1,4 @@
-const mongoose = require("mongoose"); // Added for ObjectId validation
+const mongoose = require("mongoose");
 const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const ExpressError = require("./utils/ExpressError.js");
@@ -21,8 +21,12 @@ module.exports.savedRedirectUrl = (req, res, next) => {
 };
 
 module.exports.isOwner = async (req, res, next) => {
-    let { id } = req.params;
-    let listing = await Listing.findById(id);
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error", "Listing not found!");
+        return res.redirect("/listings");
+    }
     if (!listing.owner._id.equals(res.locals.currUser._id)) {
         req.flash("error", "You don't have permission to do that!");
         return res.redirect(`/listings/${id}`);
@@ -31,42 +35,51 @@ module.exports.isOwner = async (req, res, next) => {
 };
 
 module.exports.validateListing = (req, res, next) => {
-    let { error } = listingSchema.validate(req.body);
+    const { error } = listingSchema.validate(req.body);
     if (error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
+        const errMsg = error.details.map((el) => el.message).join(",");
         throw new ExpressError(400, errMsg);
-    } else {
-        next();
     }
+    next();
 };
 
 module.exports.validateReview = (req, res, next) => {
-    let { error } = reviewSchema.validate(req.body);
+    const { error } = reviewSchema.validate(req.body);
     if (error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
+        const errMsg = error.details.map((el) => el.message).join(",");
         throw new ExpressError(400, errMsg);
-    } else {
-        next();
     }
+    next();
 };
 
 module.exports.isReviewAuthor = async (req, res, next) => {
-    let { id, reviewId } = req.params;
-    // console.log("Review ID:", reviewId); // Debug log (uncomment for troubleshooting)
+    const { id, reviewId } = req.params;
     if (!mongoose.isValidObjectId(reviewId)) {
-        // console.log("Invalid review ID format"); // Debug log
         req.flash("error", "Invalid review ID");
         return res.redirect(`/listings/${id}`);
     }
-    let review = await Review.findById(reviewId);
-    // console.log("Review found:", review); // Debug log
+    const review = await Review.findById(reviewId);
     if (!review) {
         req.flash("error", "Review not found");
         return res.redirect(`/listings/${id}`);
     }
-    if (!review.author.equals(res.locals.currUser._id)) {
+    if (!res.locals.currUser || !review.author.equals(res.locals.currUser._id)) {
         req.flash("error", "You are not the author of this review!");
         return res.redirect(`/listings/${id}`);
+    }
+    next();
+};
+
+module.exports.listingExists = async (req, res, next) => {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+        req.flash("error", "Invalid listing ID");
+        return res.redirect("/listings");
+    }
+    const listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error", "Listing not found");
+        return res.redirect("/listings");
     }
     next();
 };

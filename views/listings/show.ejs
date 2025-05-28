@@ -1,6 +1,6 @@
 <% layout("layouts/boilerplate.ejs") %>
 <script>
-    const mapToken  = "<%=process.env.MAP_TOKEN%>";
+    const mapToken = "<%=process.env.MAP_TOKEN%>";
     const listing = <%-JSON.stringify(listing) %>;
 </script> 
 <div class="row mt-3">
@@ -13,45 +13,41 @@
         <div class="card-body">
             <p class="card-text">Owned By : <i><%=listing.owner.username%></i></p>
             <p class="card-text"> <%=listing.description%></p>
-            <p class="card-text">  &#8377; <%=listing.price.toLocaleString("en-IN")%> </p>
+            <p class="card-text">  ₹ <%=listing.price.toLocaleString("en-IN")%> </p>
             <p class="card-text"><%=listing.location%></p>
             <p class="card-text"> <%=listing.country%></p>
-
         </div>        
     </div>
     <br>
     <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
     <div class="btns">
         <a href="/listings/<%=listing._id%>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
-
         <form action="/listings/<%=listing._id%>?_method=DELETE" method="POST">
             <button class="btn btn-dark offset-5 del-btn">DELETE</button>
         </form>
     </div>
     <% } %>
 
-  
     <div class="col-8 offset-3 mb-3">
-       
         <% if(currUser){ %>
-             <hr>
+        <hr>
         <h4>Leave a Review</h4>
         <form action="/listings/<%=listing._id%>/reviews" method="POST" class="needs-validation" novalidate>
             <div class="mb-3 mt-3">
-            <label for="rating" class="form-label">Rating</label>
-            <fieldset class="starability-slot">
-                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                <label for="first-rate1" title="Terrible">1 star</label>
-                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                <label for="first-rate2" title="Not good">2 stars</label>
-                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                <label for="first-rate3" title="Average">3 stars</label>
-                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                <label for="first-rate4" title="Very good">4 stars</label>
-                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                <label for="first-rate5" title="Amazing">5 stars</label>
-            </fieldset>
+                <label for="rating" class="form-label">Rating</label>
+                <fieldset class="starability-slot">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                </fieldset>
             </div>
             <div class="mb-3 mt-3">
                 <label for="comment" class="form-label">Comment</label>
@@ -64,35 +60,43 @@
         <% } %>
         
         <% if(listing.reviews.length > 0) { %>
-
-
         <div class="row">
             <p><b>All Reviews</b></p>
-            <% for (review of  listing.reviews) { %>
+            <% for (review of listing.reviews) { %>
                 <div class="card col-5 ms-3 mb-3 mr-2">
                     <div class="card-body">
                         <h5 class="card-title mt-2 " style="font-size:medium;">@<%= review.author.username %></h5>
-                        <p class="starability-result card-text"  data-rating="<%=review.rating%>">
-                        </p>
+                        <p class="starability-result card-text" data-rating="<%=review.rating%>"></p>
                         <p class="card-text"><%=review.comment%></p>
-                        
                     </div>
-                    <form action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST" >
+                    <% if(currUser && currUser._id.equals(review.author._id)) { %>
+                    <form action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
                         <button class="btn btn-dark mt-2 mb-2">Delete</button>
-                        <br>
                     </form>
+                    <% } %>
                 </div>
             <% } %>
         </div>
-
         <% } %>
     </div>
-     <div class="col-8 offset-3 mb-3">
+    <div class="col-8 offset-3 mb-3">
         <h3>Where you'll be</h3>
         <div id="map"></div>
     </div>
-        
 </div>
 
 <script src="/js/map.js"></script>
-
+<script>
+    console.log("Show page script loaded");
+    const form = document.querySelector('.needs-validation');
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            console.log("Review form submit attempted");
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    }
+</script>

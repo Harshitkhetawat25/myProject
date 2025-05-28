@@ -59,13 +59,31 @@ module.exports.renderEditForm = async (req, res) => {
 
 module.exports.updateListing = async (req, res) => {
     let { id } = req.params;
-    let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    let listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
+    }
+
+    listing.set({ ...req.body.listing });
+
     if (typeof req.file !== "undefined") {
         let url = req.file.path;
         let filename = req.file.filename;
         listing.image = { url, filename };
-        await listing.save();
     }
+
+    if (req.body.listing.location && req.body.listing.country) {
+        let response = await geocodingClient
+            .forwardGeocode({
+                query: `${req.body.listing.location}, ${req.body.listing.country}`,
+                limit: 1,
+            })
+            .send();
+        listing.geometry = response.body.features[0].geometry;
+    }
+
+    await listing.save();
     req.flash("success", "Listing Updated Successfully");
     res.redirect(`/listings/${id}`);
 };
