@@ -7,14 +7,32 @@ const listingSchema = new Schema({
         type: String,
         required: true
     },
-    description: String,
-    image: {
-        url: String,
-        filename: String
+    description: {
+        type: String,
+        required: true
     },
-    price: Number,
-    location: String,
-    country: String,
+    image: {
+        url: {
+            type: String,
+            default: "https://via.placeholder.com/300"
+        },
+        filename: {
+            type: String
+        }
+    },
+    price: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    location: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
     reviews: [
         {
             type: Schema.Types.ObjectId,
@@ -23,7 +41,8 @@ const listingSchema = new Schema({
     ],
     owner: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     },
     geometry: {
         type: {
@@ -56,7 +75,7 @@ const listingSchema = new Schema({
 });
 
 listingSchema.post("findOneAndDelete", async function (listing) {
-    if (listing) {
+    if (listing && listing.reviews.length) {
         await Review.deleteMany({ _id: { $in: listing.reviews } });
     }
 });

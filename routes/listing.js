@@ -13,6 +13,12 @@ router.route("/")
 
 router.get("/new", isLoggedIn, listingController.renderNewForm);
 
+// Search route
+router.get("/search", wrapAsync(listingController.searchListings));
+
+// Category filter route
+router.get("/category/:category", wrapAsync(listingController.filterByCategory));
+
 router.route("/:id")
     .get(wrapAsync(listingController.showListing))
     .put(isLoggedIn, isOwner, upload.single("image"), validateListing, wrapAsync(listingController.updateListing))

@@ -1,75 +1,78 @@
-<% layout("/layouts/boilerplate.ejs") %> 
-<body>
-    
-    <div class="row mt-3"> 
-        <div class="col-8 offset-2" >
-            <br><br>
-            <h3>Create Listings</h3>
-            <br>
-            <form action="/listings" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input placeholder="Add a catchy title" name="listing[title]" type="text" class="form-control" required>
-                    <div class="valid-feedback">Title Looks Good</div><div class="invalid-feedback">Please Enter Title</div>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea name="listing[description]" class="form-control" required></textarea>
-                    <div class="valid-feedback">Description Looks Good</div><div class="invalid-feedback">Please Enter Description</div>
-                </div>
-        
-                 <div class="mb-3" >
-                    <label for="image" class="form-label">Upload Image</label>
-                    <input  name="listing[image]" type="file" class="form-control">
-                </div>
-
-                <div class="row">
-                    <div class="mb-3 col-md-4">
-                        <label for="price" class="form-label">Price</label>
-                        <input placeholder="Enter Price" name="listing[price]" type="number"  class="form-control" required>
-                        <div class="invalid-feedback">Please Enter Price</div>
-                    </div>
-            
-                    <div class="mb-3 col-md-8">
-                        <label for="country" class="form-label">Country</label>
-                        <input placeholder="Enter Country" name="listing[country]" type="text" class="form-control" required>
-                        <div class="invalid-feedback">Please Enter Country</div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="location" class="form-label">Location</label>
-                    <input placeholder="Enter Location" name="listing[location]" type="text" class="form-control" required>
-                    <div class="invalid-feedback">Please Enter Location</div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="category" class="form-label">Category</label>
-                    <select name="listing[category]" class="form-control" required>
-                        <option value="" disabled selected>Select a category</option>
-                        <option value="Trending">Trending</option>
-                        <option value="Rooms">Rooms</option>
-                        <option value="Iconic cities">Iconic cities</option>
-                        <option value="Mountains">Mountains</option>
-                        <option value="Castles">Castles</option>
-                        <option value="Amazing Pools">Amazing Pools</option>
-                        <option value="Camping">Camping</option>
-                        <option value="Farms">Farms</option>
-                        <option value="Arctic">Arctic</option>
-                        <option value="Boats">Boats</option>
-                        <option value="Domes">Domes</option>
-                    </select>
-                    <div class="invalid-feedback">Please select a category</div>
-                </div>
-        
-                <br><br>
-                <button class="btn btn-dark add-btn mt-3">Add</button>
-                <br><br>
-            </form>
+<% layout("layouts/boilerplate") %>
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+    .btn-create {
+        background-color: #fe424d;
+        border-color: #fe424d;
+        color: white;
+    }
+    .btn-create:hover {
+        background-color: #d9363e;
+        border-color: #d9363e;
+    }
+</style>
+<div class="form-container">
+    <h3>Create New Listing</h3>
+    <form method="POST" action="/listings" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input name="listing[title]" id="title" type="text" class="form-control" required>
+            <div class="invalid-feedback">Please enter a title</div>
         </div>
-        
-    </div>
-    
-</body>
-<script src="/js/map.js"></script>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="listing[description]" id="description" class="form-control" required></textarea>
+            <div class="invalid-feedback">Please enter a description</div>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Upload Image</label>
+            <input name="image" id="image" type="file" class="form-control" accept="image/*">
+            <div class="invalid-feedback">Please upload a valid image</div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-4">
+                <label for="price" class="form-label">Price (₹/night)</label>
+                <input name="listing[price]" id="price" type="number" min="0" class="form-control" required>
+                <div class="invalid-feedback">Please enter a valid price</div>
+            </div>
+            <div class="mb-3 col-md-8">
+                <label for="category" class="form-label">Category</label>
+                <select name="listing[category]" id="category" class="form-select" required>
+                    <option value="" disabled selected>Select category</option>
+                    <% ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing Pools", "Camping", "Farms", "Arctic", "Boats", "Domes"].forEach(cat => { %>
+                        <option value="<%= cat %>"><%= cat %></option>
+                    <% }) %>
+                </select>
+                <div class="invalid-feedback">Please select a category</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input name="listing[location]" id="location" type="text" class="form-control" required>
+            <div class="invalid-feedback">Please enter a location</div>
+        </div>
+        <div class="mb-3">
+            <label for="country" class="form-label">Country</label>
+            <input name="listing[country]" id="country" type="text" class="form-control" required>
+            <div class="invalid-feedback">Please enter a country</div>
+        </div>
+        <button type="submit" class="btn btn-create">Create Listing</button>
+    </form>
+</div>
+<script>
+    (function () {
+        'use strict';
+        const form = document.querySelector('.needs-validation');
+        form.addEventListener('submit', (event) => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    })();
+</script>

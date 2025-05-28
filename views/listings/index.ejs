@@ -2,42 +2,49 @@
 <style>
     #filters {
         display: flex;
-        flex-wrap: wrap; /* Changed from nowrap to wrap for mobile */
+        flex-wrap: wrap;
         align-items: center;
-        gap: 1rem; /* Added gap for better spacing */
+        gap: 1rem;
         padding: 0.5rem;
-        overflow-x: auto; /* Horizontal scroll for mobile */
-        white-space: nowrap; /* Prevent text wrapping in filters */
+        overflow-x: auto;
+        white-space: nowrap;
     }
     .filter {
         text-align: center;
-        margin: 0.5rem; /* Reduced margin */
+        margin: 0.5rem;
         opacity: 0.7;
-        flex: 0 0 auto; /* Prevent filters from stretching */
+        flex: 0 0 auto;
+        transition: opacity 0.3s, color 0.3s;
     }
     .filter:hover {
         opacity: 1;
         cursor: pointer;
+        color: #fe424d;
     }
     .filter p {
         font-size: 0.8rem;
         margin: 0.2rem 0;
     }
+    .filter i {
+        font-size: 1.2rem;
+    }
     .tax-info {
         display: none;
     }
     .tax-toggle {
-        border: 1px solid black;
+        border: 1px solid #fe424d;
         border-radius: 1rem;
         height: 3rem;
         padding: 0.5rem;
         display: flex;
         align-items: center;
         flex: 0 0 auto;
+        color: #fe424d;
     }
     .active-filter {
         opacity: 1;
         font-weight: bold;
+        color: #fe424d;
     }
     .filter a {
         text-decoration: none;
@@ -46,8 +53,8 @@
     .search-results {
         margin: 1rem 0;
         font-size: 1.1rem;
+        color: #333;
     }
-    /* Filter toggle button for mobile */
     #filter-toggle {
         display: none;
         background-color: #fe424d;
@@ -58,24 +65,23 @@
         margin: 0.5rem;
         cursor: pointer;
     }
-    /* Mobile styles */
     @media (max-width: 767.98px) {
         #filters {
-            display: none; /* Hidden by default on mobile */
+            display: none;
             justify-content: flex-start;
             padding: 0.5rem;
         }
         #filters.show {
-            display: flex; /* Shown when toggled */
+            display: flex;
         }
         .filter {
             margin: 0.3rem;
         }
         .filter i {
-            font-size: 1rem; /* Smaller icons */
+            font-size: 1rem;
         }
         .filter p {
-            font-size: 0.7rem; /* Smaller text */
+            font-size: 0.7rem;
         }
         .tax-toggle {
             height: 2.5rem;
@@ -83,7 +89,7 @@
             font-size: 0.8rem;
         }
         #filter-toggle {
-            display: block; /* Show toggle button on mobile */
+            display: block;
         }
     }
 </style>
@@ -101,47 +107,47 @@
             <p>All</p>
         </div>
         <div class="filter <%= activeCategory === 'Trending' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Trending"><i class="fa-solid fa-fire"></i></a>
+            <a href="/listings/category/Trending"><i class="fa-solid fa-fire"></i></a>
             <p>Trending</p>
         </div>
         <div class="filter <%= activeCategory === 'Rooms' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Rooms"><i class="fa-solid fa-bed"></i></a>
+            <a href="/listings/category/Rooms"><i class="fa-solid fa-bed"></i></a>
             <p>Rooms</p>
         </div>
         <div class="filter <%= activeCategory === 'Iconic cities' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Iconic cities"><i class="fa-solid fa-mountain-city"></i></a>
+            <a href="/listings/category/Iconic cities"><i class="fa-solid fa-mountain-city"></i></a>
             <p>Iconic cities</p>
         </div>
         <div class="filter <%= activeCategory === 'Mountains' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Mountains"><i class="fa-solid fa-mountain-sun"></i></a>
+            <a href="/listings/category/Mountains"><i class="fa-solid fa-mountain-sun"></i></a>
             <p>Mountains</p>
         </div>
         <div class="filter <%= activeCategory === 'Castles' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Castles"><i class="fa-brands fa-fort-awesome"></i></a>
+            <a href="/listings/category/Castles"><i class="fa-brands fa-fort-awesome"></i></a>
             <p>Castles</p>
         </div>
         <div class="filter <%= activeCategory === 'Amazing Pools' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Amazing Pools"><i class="fa-solid fa-person-swimming"></i></a>
+            <a href="/listings/category/Amazing Pools"><i class="fa-solid fa-person-swimming"></i></a>
             <p>Amazing Pools</p>
         </div>
         <div class="filter <%= activeCategory === 'Camping' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Camping"><i class="fa-solid fa-campground"></i></a>
+            <a href="/listings/category/Camping"><i class="fa-solid fa-campground"></i></a>
             <p>Camping</p>
         </div>
         <div class="filter <%= activeCategory === 'Farms' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Farms"><i class="fa-solid fa-tractor"></i></a>
+            <a href="/listings/category/Farms"><i class="fa-solid fa-tractor"></i></a>
             <p>Farms</p>
         </div>
         <div class="filter <%= activeCategory === 'Arctic' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Arctic"><i class="fa-solid fa-snowflake"></i></a>
+            <a href="/listings/category/Arctic"><i class="fa-solid fa-snowflake"></i></a>
             <p>Arctic</p>
         </div>
         <div class="filter <%= activeCategory === 'Boats' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Boats"><i class="fa-solid fa-ship"></i></a>
+            <a href="/listings/category/Boats"><i class="fa-solid fa-ship"></i></a>
             <p>Boats</p>
         </div>
         <div class="filter <%= activeCategory === 'Domes' ? 'active-filter' : '' %>">
-            <a href="/listings/filter/Domes"><i class="fa-solid fa-igloo"></i></a>
+            <a href="/listings/category/Domes"><i class="fa-solid fa-igloo"></i></a>
             <p>Domes</p>
         </div>
         <div class="tax-toggle">
