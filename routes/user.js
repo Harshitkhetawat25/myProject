@@ -1,25 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { savedRedirectUrl } = require("../middleware.js");
-const userController = require("../controllers/users");
+const wrapAsync = require("../utils/wrapAsync.js");
+const userController = require("../controllers/users.js");
 
-router.route("/signup")
-    .get(userController.renderSignupForm)
-    .post(userController.signupUser);
+router.get("/register", userController.renderSignupForm);
+router.post("/register", wrapAsync(userController.signupUser));
 
-router.route("/login")
-    .get(userController.renderLoginForm)
-    .post(savedRedirectUrl, passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }), userController.loginUser);
+router.get("/login", userController.renderLoginForm);
+router.post(
+    "/login",
+    passport.authenticate("local", {
+        failureFlash: true,
+        failureRedirect: "/login"
+    }),
+    userController.loginUser
+);
 
 router.get("/logout", userController.logoutUser);
 
-router.route("/forgot-password")
-    .get(userController.renderForgotForm)
-    .post(userController.sendResetEmail);
+router.get("/forgot-password", userController.renderForgotForm);
+router.post("/forgot-password", wrapAsync(userController.sendResetEmail));
 
-router.route("/reset-password/:token")
-    .get(userController.renderResetForm)
-    .post(userController.resetPassword);
+// Handle both /reset/:token and /reset-password/:token
+router.get(["/reset/:token", "/reset-password/:token"], wrapAsync(userController.renderResetForm));
+router.post(["/reset/:token", "/reset-password/:token"], wrapAsync(userController.resetPassword));
 
 module.exports = router;

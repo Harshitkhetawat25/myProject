@@ -1,8 +1,8 @@
 const User = require("../models/user");
 const ExpressError = require("../utils/ExpressError");
 const { userSchema } = require("../schema");
-const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const transporter = require("../utils/nodemailerConfig");
 
 module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup.ejs");
@@ -11,7 +11,7 @@ module.exports.renderSignupForm = (req, res) => {
 module.exports.signupUser = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
-        console.log("Signup attempt:", { username, email, password });
+        console.log("Signup attempt:", { username, email });
         const { error } = userSchema.validate({ username, email, password }, { abortEarly: false });
         if (error) {
             const errMsg = error.details.map(el => el.message).join(", ");
@@ -63,8 +63,10 @@ module.exports.renderForgotForm = (req, res) => {
 module.exports.sendResetEmail = async (req, res) => {
     try {
         const { email } = req.body;
+        console.log("Send Reset Email - Email:", email);
         const user = await User.findOne({ email });
         if (!user) {
+            console.log("No user found for email:", email);
             req.flash("error", "No account with that email address exists.");
             return res.redirect("/forgot-password");
         }
@@ -73,30 +75,29 @@ module.exports.sendResetEmail = async (req, res) => {
         user.resetPasswordToken = token;
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
+        console.log("Reset token saved for user:", user.email);
 
-        const transporter = nodemailer.createTransport({
-            service: "Gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
+        const resetUrl = `${process.env.BASE_URL}/reset/${token}`;
         const mailOptions = {
             to: user.email,
             from: process.env.EMAIL_USER,
             subject: "WanderWhirl Password Reset",
             text: `You are receiving this because you (or someone else) have requested a password reset.\n\n
                    Please click the following link to reset your password:\n\n
-                   ${process.env.BASE_URL}/reset-password/${token}\n\n
+                   ${resetUrl}\n\n
                    If you did not request this, please ignore this email.\n`
         };
 
         await transporter.sendMail(mailOptions);
+        console.log("Reset email sent to:", user.email, "URL:", resetUrl);
         req.flash("success", "An email has been sent with further instructions.");
         res.redirect("/login");
     } catch (e) {
-        console.error("Email error:", e.message);
+        console.error("Email error:", {
+            message: e.message,
+            stack: e.stack,
+            email: req.body.email
+        });
         req.flash("error", "Failed to send reset email. Please try again.");
         res.redirect("/forgot-password");
     }
@@ -104,11 +105,13 @@ module.exports.sendResetEmail = async (req, res) => {
 
 module.exports.renderResetForm = async (req, res) => {
     const { token } = req.params;
+    console.log("Render Reset Form - Token:", token);
     const user = await User.findOne({
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() }
     });
     if (!user) {
+        console.log("Invalid or expired token:", token);
         req.flash("error", "Password reset token is invalid or has expired.");
         return res.redirect("/forgot-password");
     }
@@ -119,11 +122,13 @@ module.exports.resetPassword = async (req, res) => {
     try {
         const { token } = req.params;
         const { password } = req.body;
+        console.log("Reset Password - Token:", token);
         const user = await User.findOne({
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }
         });
         if (!user) {
+            console.log("Invalid or expired token:", token);
             req.flash("error", "Password reset token is invalid or has expired.");
             return res.redirect("/forgot-password");
         }
@@ -132,7 +137,7 @@ module.exports.resetPassword = async (req, res) => {
         if (error) {
             const errMsg = error.details.map(el => el.message).join(", ");
             req.flash("error", errMsg);
-            return res.redirect(`/reset-password/${token}`);
+            return res.redirect(`/reset/${token}`);
         }
 
         await user.setPassword(password);
@@ -146,7 +151,10 @@ module.exports.resetPassword = async (req, res) => {
             res.redirect("/listings");
         });
     } catch (e) {
-        console.error("Reset error:", e.message);
+        console.error("Reset error:", {
+            message: e.message,
+            stack: e.stack
+        });
         req.flash("error", "Failed to reset password. Please try again.");
         res.redirect("/forgot-password");
     }

@@ -1,55 +1,51 @@
 <% layout("layouts/boilerplate") %>
 <style>
-    .form-control {
-        font-size: 0.9rem;
+    .form-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        padding: 1rem;
     }
-    .form-label {
-        font-size: 0.9rem;
-    }
-    .btn-dark {
+    .btn-submit {
         background-color: #fe424d;
-        border: none;
+        border-color: #fe424d;
+        color: white;
     }
-    @media (max-width: 767.98px) {
-        .form-control {
-            font-size: 0.8rem;
-            padding: 0.5rem;
-        }
-        .form-label {
-            font-size: 0.8rem;
-        }
-        .col-6.offset-3 {
-            padding: 0 0.5rem;
-        }
-        .btn-dark {
-            padding: 0.5rem;
-            font-size: 0.8rem;
-        }
+    .btn-submit:hover {
+        background-color: #d9363e;
+        border-color: #d9363e;
     }
 </style>
-<div class="row mt-3">
-    <div class="col-6 offset-3">
-        <h1 class="col-6 offset-3">Forgot Password</h1>
-        <form action="/forgot-password" method="POST" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" name="email" id="email" class="form-control" required>
-                <div class="invalid-feedback">Please enter a valid email</div>
-            </div>
-            <button class="btn btn-dark">Send Reset Link</button>
-        </form>
-    </div>
+<div class="form-container">
+    <h3>Forgot Password</h3>
+    <% if (error && error.length) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% } %>
+    <% if (success && success.length) { %>
+        <div class="alert alert-success" role="alert">
+            <%= success %>
+        </div>
+    <% } %>
+    <form action="/forgot-password" method="POST" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+            <div class="invalid-feedback">Please enter a valid email</div>
+        </div>
+        <button type="submit" class="btn btn-submit">Send Reset Link</button>
+    </form>
 </div>
-
 <script>
-    console.log("Forgot password form script loaded");
-    const form = document.querySelector('.needs-validation');
-    form.addEventListener('submit', (event) => {
-        console.log("Form submit attempted");
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-    });
+    (function () {
+        'use strict';
+        const form = document.querySelector('.needs-validation');
+        form.addEventListener('submit', (event) => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    })();
 </script>
