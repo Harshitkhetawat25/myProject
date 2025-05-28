@@ -1,7 +1,9 @@
 require("dotenv").config({ path: require("path").resolve(__dirname, ".env") });
 console.log("MAP_TOKEN:", process.env.MAP_TOKEN ? "Loaded" : "Missing");
-if (!process.env.MAP_TOKEN) {
-    throw new Error("MAP_TOKEN is missing in .env");
+console.log("EMAIL_USER:", process.env.EMAIL_USER ? "Loaded" : "Missing");
+console.log("BASE_URL:", process.env.BASE_URL || "Not set");
+if (!process.env.MAP_TOKEN || !process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.BASE_URL) {
+    throw new Error("Missing required .env variables: MAP_TOKEN, EMAIL_USER, EMAIL_PASS, or BASE_URL");
 }
 
 const express = require("express");
@@ -80,7 +82,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Load routes after .env
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/user.js");
@@ -90,6 +91,7 @@ app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
 app.all(/.*/, (req, res, next) => {
+    console.log("404 - Requested Path:", req.path);
     next(new ExpressError(404, "Page Not Found!"));
 });
 
@@ -98,7 +100,9 @@ app.use((err, req, res, next) => {
         name: err.name,
         message: err.message,
         stack: err.stack,
-        statusCode: err.statusCode || 500
+        statusCode: err.statusCode || 500,
+        path: req.path,
+        method: req.method
     });
     let statusCode = err.statusCode || 500;
     let message = err.message || "Something went wrong!";
@@ -110,7 +114,7 @@ app.use((err, req, res, next) => {
         message = "Invalid file upload field. Please use the correct file input.";
     } else if (err.name === "ValidationError") {
         statusCode = 400;
-        message = "Invalid listing data: " + Object.values(err.errors).map(e => e.message).join(", ");
+        message = "Invalid data: " + Object.values(err.errors).map(e => e.message).join(", ");
     }
     res.status(statusCode).render("error.ejs", { err: { message, statusCode } });
 });

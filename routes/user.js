@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const router = express.Router({ caseSensitive: false });
 const passport = require("passport");
 const wrapAsync = require("../utils/wrapAsync.js");
 const userController = require("../controllers/users.js");
