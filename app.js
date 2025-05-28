@@ -102,7 +102,7 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-app.all("*", (req, res, next) => {
+app.all(/.*/, (req, res, next) => {
     console.log("404 - Requested Path:", req.path, "Method:", req.method);
     next(new ExpressError(404, "Page Not Found!"));
 });
