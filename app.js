@@ -91,6 +91,8 @@ app.use((req, res, next) => {
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/user.js");
+const bookingRouter = require("./routes/bookings");
+const { localsMiddleware } = require("./middleware.js");
 
 // Root route
 app.get("/", (req, res) => {
@@ -101,7 +103,8 @@ app.get("/", (req, res) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
-
+app.use("/bookings", bookingRouter);
+app.use(localsMiddleware);
 app.all(/.*/, (req, res, next) => {
     console.log("404 - Requested Path:", req.path, "Method:", req.method);
     next(new ExpressError(404, "Page Not Found!"));

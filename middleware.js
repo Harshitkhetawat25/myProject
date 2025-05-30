@@ -4,13 +4,13 @@ const Review = require("./models/review.js");
 const ExpressError = require("./utils/ExpressError.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
 
+// middleware.js
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
-        req.session.redirectUrl = req.originalUrl;
-        req.flash("error", "You must be logged in to perform this action!");
+        req.flash("error", "You must be signed in first!");
         return res.redirect("/login");
     }
-    next();
+    next(); // Make sure this is being called
 };
 
 module.exports.savedRedirectUrl = (req, res, next) => {
@@ -81,5 +81,21 @@ module.exports.listingExists = async (req, res, next) => {
         req.flash("error", "Listing not found");
         return res.redirect("/listings");
     }
+    next();
+};
+
+module.exports.checkListingAvailability = async (req, res, next) => {
+    const listing = await Listing.findById(req.params.id);
+    if (listing && listing.isBooked) {
+        req.flash("error", "This property is already booked");
+        return res.redirect(`/listings/${req.params.id}`);
+    }
+    next();
+};
+
+module.exports.localsMiddleware = (req, res, next) => {
+    res.locals.currUser = req.user; // Passport adds user to req
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
     next();
 };

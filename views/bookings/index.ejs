@@ -1,0 +1,31 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="container mt-5">
+    <h2>My Bookings</h2>
+    
+    <% if(bookings.length === 0) { %>
+        <div class="alert alert-info">You don't have any bookings yet.</div>
+    <% } else { %>
+        <div class="row">
+            <% bookings.forEach(booking => { %>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><%= booking.listing.title %></h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Dates:</strong> 
+                                <%= new Date(booking.checkIn).toLocaleDateString() %> - 
+                                <%= new Date(booking.checkOut).toLocaleDateString() %>
+                            </p>
+                            <p><strong>Guests:</strong> <%= booking.guests %></p>
+                            <p><strong>Total Price:</strong> ₹<%= booking.totalPrice.toLocaleString('en-IN') %></p>
+                            <a href="/bookings/<%= booking._id %>" class="btn btn-primary">View Details</a>
+                            <a href="/bookings/<%= booking._id %>/download" class="btn btn-secondary">Download Invoice</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>

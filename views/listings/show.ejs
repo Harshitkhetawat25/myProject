@@ -12,13 +12,27 @@
         <img src="<%=listing.image.url%>" class="card-img-top show-img " alt="listing_image">
         <div class="card-body">
             <p class="card-text">Owned By : <i><%=listing.owner.username%></i></p>
-            <p class="card-text"> <%=listing.description%></p>
-            <p class="card-text">  ₹ <%=listing.price.toLocaleString("en-IN")%> </p>
+            <p class="card-text"><%=listing.description%></p>
+            <p class="card-text">₹ <%=listing.price.toLocaleString("en-IN")%> <span class="text-muted">per night</span></p>
             <p class="card-text"><%=listing.location%></p>
-            <p class="card-text"> <%=listing.country%></p>
+            <p class="card-text"><%=listing.country%></p>
+            
+            <!-- Book Now Button -->
+            <% if(listing.isBooked) { %>
+        <div class="alert alert-warning mt-3">
+            This property is currently booked
+        </div>
+    <% } else if(currUser && !listing.owner._id.equals(currUser._id)) { %>
+        <button class="btn btn-primary book-now-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
+            Book Now
+        </button>
+    <% } else if(!currUser) { %>
+        <a href="/login" class="btn btn-primary">Book Now</a>
+    <% } %>
         </div>        
     </div>
     <br>
+    
     <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
     <div class="btns">
         <a href="/listings/<%=listing._id%>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
@@ -27,6 +41,42 @@
         </form>
     </div>
     <% } %>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Book <%=listing.title%></h5>
+                    <button type="button" class="btn-close" data-bs-close="modal" aria-label="Close"></button>
+                </div>
+                <form id="bookingForm" action="/listings/<%=listing._id%>/bookings" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="checkIn" class="form-label">Check-in Date</label>
+                            <input type="date" class="form-control" id="checkIn" name="booking[checkIn]" required min="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="checkOut" class="form-label">Check-out Date</label>
+                            <input type="date" class="form-control" id="checkOut" name="booking[checkOut]" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="guests" class="form-label">Number of Guests</label>
+                            <input type="number" class="form-control" id="guests" name="booking[guests]" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Total: <span id="totalPrice">₹0</span></h5>
+                            <p class="text-muted" id="nightsCount">0 nights</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div class="col-8 offset-3 mb-3">
         <% if(currUser){ %>
@@ -99,4 +149,57 @@
             form.classList.add('was-validated');
         });
     }
+
+    // Booking form calculation
+    const pricePerNight = <%=listing.price%>;
+    const checkInInput = document.getElementById('checkIn');
+    const checkOutInput = document.getElementById('checkOut');
+    const guestsInput = document.getElementById('guests');
+    const totalPriceElement = document.getElementById('totalPrice');
+    const nightsCountElement = document.getElementById('nightsCount');
+
+    // Set minimum check-out date based on check-in date
+    checkInInput.addEventListener('change', function() {
+        if (this.value) {
+            const checkInDate = new Date(this.value);
+            const nextDay = new Date(checkInDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            
+            checkOutInput.min = nextDay.toISOString().split('T')[0];
+            if (checkOutInput.value && new Date(checkOutInput.value) <= checkInDate) {
+                checkOutInput.value = '';
+                calculateTotal();
+            }
+        }
+    });
+
+    function calculateTotal() {
+        if (checkInInput.value && checkOutInput.value && guestsInput.value) {
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+            
+            // Calculate nights (round up to count partial days)
+            const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const guests = parseInt(guestsInput.value);
+            const total = pricePerNight * nights * guests;
+            
+            totalPriceElement.textContent = `₹${total.toLocaleString('en-IN')}`;
+            nightsCountElement.textContent = `${nights} night${nights !== 1 ? 's' : ''}`;
+        } else {
+            totalPriceElement.textContent = '₹0';
+            nightsCountElement.textContent = '0 nights';
+        }
+    }
+
+    checkInInput.addEventListener('change', calculateTotal);
+    checkOutInput.addEventListener('change', calculateTotal);
+    guestsInput.addEventListener('input', calculateTotal);
+
+    // Initialize Bootstrap tooltips if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
 </script>

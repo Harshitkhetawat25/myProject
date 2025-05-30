@@ -71,8 +71,18 @@ const listingSchema = new Schema({
             "Domes"
         ],
         required: true
-    }
+    },
+     isBooked: {
+        type: Boolean,
+        default: false
+    },
+    bookings: [{
+        type: Schema.Types.ObjectId,
+        ref: "Booking"
+    }]
 });
+
+
 
 listingSchema.post("findOneAndDelete", async function (listing) {
     if (listing && listing.reviews.length) {
