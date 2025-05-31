@@ -6,7 +6,7 @@
     padding: 8px 16px;
   }
   .navbar .btn-search:hover {
-    background-color: #fe424d;
+    background-color: #e63946;
     color: #fff;
   }
   .navbar .btn-search i {
@@ -17,6 +17,57 @@
     border-radius: 25px;
     padding: 0.5rem 3rem 0.5rem 3rem;
   }
+  
+  /* Logo styling */
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fe424d !important;
+    text-decoration: none;
+  }
+  .navbar-brand:hover {
+    color: #e63946 !important;
+  }
+  
+  /* Create listing button styling */
+  .btn-create-listing {
+    background-color: #28a745;
+    color: white;
+    border-radius: 20px;
+    padding: 6px 12px;
+    text-decoration: none;
+    border: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+  .btn-create-listing:hover {
+    background-color: #218838;
+    color: white;
+    text-decoration: none;
+  }
+  
+  /* User menu styling */
+  .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    transition: color 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #fe424d !important;
+  }
+  
+  /* Welcome user text */
+  .welcome-user {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+  }
+  
   /* Mobile dropdown styles */
   @media (max-width: 767.98px) {
     .navbar-collapse {
@@ -52,6 +103,17 @@
       font-size: 0.9rem;
       padding: 0.5rem 2rem;
     }
+    .user-menu {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    .btn-create-listing {
+      width: 100%;
+      text-align: center;
+      margin: 0.5rem 0;
+    }
     /* Adjusted margin to avoid overlap with filters */
     .navbar-expanded + .container,
     .navbar-expanded + main,
@@ -61,45 +123,75 @@
     }
   }
 </style>
+
 <nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
+    <!-- Logo/Brand -->
+    <a class="navbar-brand" href="/listings">
+      <i class="fa-solid fa-home"></i> WanderWhirl
+    </a>
+    
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link" href="/listings">Explore</a>
-      </div>
+      <!-- Left side navigation -->
+   
+      
+      <!-- Center - Search bar -->
       <div class="navbar-nav ms-auto">
         <form class="d-flex" role="search" action="/listings/search" method="GET">
-          <input class="form-control me-2 search-input" type="search" name="query" placeholder="Search destination" aria-label="Search" value="<%= typeof query !== 'undefined' ? query : '' %>"/>
-          <button class="btn btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
+          <input class="form-control me-2 search-input" type="search" name="query" placeholder="Search destinations..." aria-label="Search" value="<%= typeof query !== 'undefined' ? query : '' %>"/>
+          <button class="btn btn-search" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>Search
+          </button>
         </form>
       </div>
+      
+      <!-- Right side - User menu -->
       <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Your Home</a>
-        <% if(currUser) { %>
-          <li class="nav-item">
-              <a class="nav-link" href="/bookings/my-bookings">My Bookings</a>
-          </li>
-        <% } %>
-        <% if(!currUser){ %>        
-          <a class="nav-link" href="/signup"><b>SignUp</b></a>
-          <a class="nav-link" href="/login"><b>Login</b></a>
-        <% } %>
-        <% if(currUser){ %>
-          <a class="nav-link" href="/logout">Logout</a>
-        <% } %>
-
+        <div class="user-menu">
+          <!-- Create New Listing Button -->
+          <a class="btn btn-create-listing" href="/listings/new">
+            <i class="fa-solid fa-plus"></i> Add your Home
+          </a>
+          
+          <% if(currUser) { %>
+            <!-- Welcome message -->
+            <span class="welcome-user">Hi, <%= currUser.username || 'User' %>!</span>
+            
+            <!-- My Bookings -->
+            <a class="nav-link" href="/bookings/my-bookings">
+              <i class="fa-solid fa-calendar-check"></i> My Bookings
+            </a>
+            
+            <!-- Logout -->
+            <a class="nav-link" href="/logout">
+              <i class="fa-solid fa-sign-out-alt"></i> Logout
+            </a>
+          <% } else { %>
+            <!-- Sign Up -->
+            <a class="nav-link" href="/signup">
+              <i class="fa-solid fa-user-plus"></i> <b>Sign Up</b>
+            </a>
+            
+            <!-- Login -->
+            <a class="nav-link" href="/login">
+              <i class="fa-solid fa-sign-in-alt"></i> <b>Login</b>
+            </a>
+          <% } %>
+        </div>
       </div>
     </div>
   </div>
 </nav>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const toggler = document.querySelector('.navbar-toggler');
     const collapse = document.querySelector('.navbar-collapse');
+    
     toggler.addEventListener('click', () => {
       if (collapse.classList.contains('show')) {
         document.body.classList.remove('navbar-expanded');
@@ -107,6 +199,7 @@
         document.body.classList.add('navbar-expanded');
       }
     });
+    
     collapse.addEventListener('hidden.bs.collapse', () => {
       document.body.classList.remove('navbar-expanded');
     });
