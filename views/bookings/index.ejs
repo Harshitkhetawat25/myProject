@@ -1,31 +1,413 @@
 <% layout("layouts/boilerplate.ejs") %>
 
-<div class="container mt-5">
-    <h2>My Bookings</h2>
-    
-    <% if(bookings.length === 0) { %>
-        <div class="alert alert-info">You don't have any bookings yet.</div>
-    <% } else { %>
-        <div class="row">
-            <% bookings.forEach(booking => { %>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><%= booking.listing.title %></h5>
+<div class="bookings-container">
+    <!-- Header Section -->
+    <div class="bookings-header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="page-title">Your trips</h1>
+                <p class="page-subtitle">Manage your bookings and explore new destinations</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <% if(bookings.length === 0) { %>
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <div class="empty-icon">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M3 9a2 2 0 0 1 2-2h.93a2 2 0 0 0 1.664-.89l.812-1.22A2 2 0 0 1 10.07 4h3.86a2 2 0 0 1 1.664.89l.812 1.22A2 2 0 0 0 18.07 7H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/>
+                            <circle cx="12" cy="13" r="3"/>
+                        </svg>
+                    </div>
+                    <h3>No trips booked...yet!</h3>
+                    <p>Time to dust off your bags and start planning your next adventure</p>
+                    <a href="/listings" class="btn-primary-custom">Start searching</a>
+                </div>
+            </div>
+        <% } else { %>
+            <!-- Bookings Grid -->
+            <div class="bookings-grid">
+                <% bookings.forEach(booking => { %>
+                    <div class="booking-card">
+                        <div class="booking-card-header">
+                            <div class="property-info">
+                                <h3 class="property-title"><%= booking.listing.title %></h3>
+                                <div class="booking-status active">
+                                    <span class="status-dot"></span>
+                                    Confirmed
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <p><strong>Dates:</strong> 
-                                <%= new Date(booking.checkIn).toLocaleDateString() %> - 
-                                <%= new Date(booking.checkOut).toLocaleDateString() %>
-                            </p>
-                            <p><strong>Guests:</strong> <%= booking.guests %></p>
-                            <p><strong>Total Price:</strong> ₹<%= booking.totalPrice.toLocaleString('en-IN') %></p>
-                            <a href="/bookings/<%= booking._id %>" class="btn btn-primary">View Details</a>
-                            <a href="/bookings/<%= booking._id %>/download" class="btn btn-secondary">Download Invoice</a>
+                        
+                        <div class="booking-details">
+                            <div class="detail-row">
+                                <div class="detail-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Check-in - Check-out</span>
+                                    <span class="detail-value">
+                                        <%= new Date(booking.checkIn).toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            year: 'numeric' 
+                                        }) %> - 
+                                        <%= new Date(booking.checkOut).toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            year: 'numeric' 
+                                        }) %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="detail-row">
+                                <div class="detail-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Guests</span>
+                                    <span class="detail-value"><%= booking.guests %> <%= booking.guests === 1 ? 'guest' : 'guests' %></span>
+                                </div>
+                            </div>
+
+                            <div class="detail-row">
+                                <div class="detail-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="1" x2="12" y2="23"/>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Total paid</span>
+                                    <span class="detail-value price">₹<%= (booking.totalPrice || 0).toLocaleString('en-IN') %></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="booking-actions">
+                            <a href="/bookings/<%= booking._id %>" class="btn-outline">View details</a>
+                            <a href="/bookings/<%= booking._id %>/download" class="btn-secondary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7,10 12,15 17,10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Download invoice
+                            </a>
                         </div>
                     </div>
-                </div>
-            <% }) %>
-        </div>
-    <% } %>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
 </div>
+
+<style>
+/* Custom styles for professional booking page */
+.bookings-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+}
+
+.bookings-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    text-align: center;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+    font-weight: 400;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Empty State Styles */
+.empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    text-align: center;
+}
+
+.empty-state-content {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+}
+
+.empty-icon {
+    color: #e0e0e0;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+/* Bookings Grid */
+.bookings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    padding-bottom: 3rem;
+}
+
+.booking-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.booking-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.booking-card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.property-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.property-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
+    line-height: 1.3;
+    flex: 1;
+}
+
+.booking-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #e8f5e8;
+    color: #2d5a2d;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #4caf50;
+    border-radius: 50%;
+}
+
+.booking-details {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.detail-icon {
+    color: #666;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.detail-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 1rem;
+    color: #222;
+    font-weight: 600;
+}
+
+.detail-value.price {
+    color: #e91e63;
+    font-size: 1.125rem;
+}
+
+.booking-actions {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.btn-outline {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #ddd;
+    background: white;
+    color: #333;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-outline:hover {
+    border-color: #667eea;
+    color: #667eea;
+    background: #f8f9ff;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    color: #666;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+}
+
+.btn-secondary:hover {
+    background: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+    border-color: #dee2e6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .bookings-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .booking-actions {
+        flex-direction: column;
+    }
+    
+    .property-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .booking-status {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .bookings-header {
+        padding: 1.5rem 0;
+    }
+    
+    .empty-state-content {
+        padding: 2rem 1.5rem;
+    }
+}
+</style>

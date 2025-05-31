@@ -110,18 +110,33 @@ module.exports.updateListing = async (req, res, next) => {
             throw new ExpressError(404, "Listing you requested for does not exist!");
         }
 
-        listing.set({ ...req.body });
+        // Debug logging
+        console.log("Update Request Body:", req.body);
+        console.log("Listing data:", req.body.listing);
 
+        // Extract listing data from req.body.listing (consistent with your create function)
+        const listingData = req.body.listing || req.body;
+        
+        // Validate required fields
+        if (!listingData.category) {
+            throw new ExpressError(400, "Category is required");
+        }
+
+        // Update the listing with the correct data structure
+        listing.set(listingData);
+
+        // Handle file upload
         if (typeof req.file !== "undefined") {
             let url = req.file.path;
             let filename = req.file.filename;
             listing.image = { url, filename };
         }
 
-        if (req.body.listing.location && req.body.listing.country) {
+        // Handle geocoding if location or country changed
+        if (listingData.location && listingData.country) {
             let response = await geocodingClient
                 .forwardGeocode({
-                    query: `${req.body.listing.location}, ${req.body.listing.country}`,
+                    query: `${listingData.location}, ${listingData.country}`,
                     limit: 1,
                 })
                 .send();
@@ -133,6 +148,7 @@ module.exports.updateListing = async (req, res, next) => {
             listing.geometry = response.body.features[0].geometry;
         }
 
+        console.log("Listing before save:", listing);
         await listing.save();
         req.flash("success", "Listing Updated Successfully");
         res.redirect(`/listings/${id}`);
@@ -141,7 +157,6 @@ module.exports.updateListing = async (req, res, next) => {
         next(err);
     }
 };
-
 module.exports.destroyListing = async (req, res) => {
     let { id } = req.params;
     let listToDeleted = await Listing.findByIdAndDelete(id);

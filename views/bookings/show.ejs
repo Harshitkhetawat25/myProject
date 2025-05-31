@@ -1,31 +1,634 @@
 <% layout("layouts/boilerplate.ejs") %>
 
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header">
-            <h3>Booking Confirmation</h3>
+<div class="confirmation-container">
+    <!-- Success Header -->
+    <div class="confirmation-header">
+        <div class="container">
+            <div class="success-indicator">
+                <div class="success-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22,4 12,14.01 9,11.01"/>
+                    </svg>
+                </div>
+                <div class="success-content">
+                    <h1>Booking Confirmed!</h1>
+                    <p>Your reservation has been successfully processed</p>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <h5 class="card-title">Booking ID: <%= booking._id %></h5>
-            <p class="card-text">Booked on: <%= new Date(booking.bookingDate).toLocaleDateString() %></p>
-            <hr>
-            
-            <h5>Property Details</h5>
-            <p><strong><%= booking.listing.title %></strong></p>
-            <p><%= booking.listing.location %>, <%= booking.listing.country %></p>
-            <p>₹<%= booking.listing.price.toLocaleString('en-IN') %> per night</p>
-            <hr>
-            
-            <h5>Booking Details</h5>
-            <p>Check-in: <%= new Date(booking.checkIn).toLocaleDateString() %></p>
-            <p>Check-out: <%= new Date(booking.checkOut).toLocaleDateString() %></p>
-            <p>Guests: <%= booking.guests %></p>
-            <hr>
-            
-            <h4>Total: ₹<%= booking.totalPrice.toLocaleString('en-IN') %></h4>
-            
-            <a href="/bookings/<%= booking._id %>/download" class="btn btn-primary mt-3">Download Invoice</a>
-            <a href="/listings/<%= booking.listing._id %>" class="btn btn-secondary mt-3">Back to Listing</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="confirmation-content">
+            <!-- Booking Summary Card -->
+            <div class="booking-summary-card">
+                <div class="card-header-custom">
+                    <h2>Booking Summary</h2>
+                    <div class="booking-id">
+                        <span class="id-label">Booking ID</span>
+                        <span class="id-value">#<%= booking._id.toString().slice(-8).toUpperCase() %></span>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <div class="booking-meta">
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                            </div>
+                            <div class="meta-content">
+                                <span class="meta-label">Booked on</span>
+                                <span class="meta-value"><%= new Date(booking.bookingDate).toLocaleDateString('en-US', { 
+                                    weekday: 'long',
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                }) %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Section -->
+                    <div class="section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9,22 9,12 15,12 15,22"/>
+                            </svg>
+                            Property Details
+                        </h3>
+                        <div class="property-card">
+                            <div class="property-header">
+                                <h4 class="property-title"><%= booking.listing.title %></h4>
+                                <div class="property-price">₹<%= booking.listing.price.toLocaleString('en-IN') %><span>/night</span></div>
+                            </div>
+                            <div class="property-location">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                <%= booking.listing.location %>, <%= booking.listing.country %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stay Details Section -->
+                    <div class="section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            Stay Details
+                        </h3>
+                        <div class="stay-details-grid">
+                            <div class="detail-group">
+                                <div class="detail-item">
+                                    <span class="detail-label">Check-in</span>
+                                    <span class="detail-value"><%= new Date(booking.checkIn).toLocaleDateString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        year: 'numeric' 
+                                    }) %></span>
+                                    <span class="detail-day"><%= new Date(booking.checkIn).toLocaleDateString('en-US', { weekday: 'long' }) %></span>
+                                </div>
+                                <div class="detail-separator">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9,18 15,12 9,6"/>
+                                    </svg>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Check-out</span>
+                                    <span class="detail-value"><%= new Date(booking.checkOut).toLocaleDateString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        year: 'numeric' 
+                                    }) %></span>
+                                    <span class="detail-day"><%= new Date(booking.checkOut).toLocaleDateString('en-US', { weekday: 'long' }) %></span>
+                                </div>
+                            </div>
+                            
+                            <div class="guests-info">
+                                <div class="guests-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="detail-label">Guests</span>
+                                    <span class="detail-value"><%= booking.guests %> <%= booking.guests === 1 ? 'guest' : 'guests' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="section payment-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                            </svg>
+                            Payment Summary
+                        </h3>
+                        <div class="payment-breakdown">
+                            <div class="payment-row">
+                                <span>₹<%= booking.listing.price.toLocaleString('en-IN') %> × <%= Math.ceil((new Date(booking.checkOut) - new Date(booking.checkIn)) / (1000 * 60 * 60 * 24)) %> nights</span>
+                                <span>₹<%= (booking.listing.price * Math.ceil((new Date(booking.checkOut) - new Date(booking.checkIn)) / (1000 * 60 * 60 * 24))).toLocaleString('en-IN') %></span>
+                            </div>
+                            <div class="payment-row">
+                                <span>Service fee</span>
+                                <span>₹<%= Math.round(booking.totalPrice * 0.1).toLocaleString('en-IN') %></span>
+                            </div>
+                            <div class="payment-row">
+                                <span>Taxes</span>
+                                <span>₹<%= Math.round(booking.totalPrice * 0.05).toLocaleString('en-IN') %></span>
+                            </div>
+                        </div>
+                        <div class="payment-total">
+                                <span>Total Amount Paid</span>
+                                            <% 
+                                                let displayPrice = 0;
+                                                if (booking.totalPrice && typeof booking.totalPrice === 'number') {
+                                                    displayPrice = booking.totalPrice;
+                                                } else if (booking.listing && booking.listing.price && booking.checkIn && booking.checkOut && booking.guests) {
+                                                    // Fallback calculation if totalPrice is missing
+                                                    const nights = Math.ceil((new Date(booking.checkOut) - new Date(booking.checkIn)) / (1000 * 60 * 60 * 24));
+                                                    displayPrice = booking.listing.price * nights * booking.guests;
+                                                }
+                                             %>
+                                <span class="total-amount">₹<%= displayPrice.toLocaleString('en-IN') %></span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="/bookings/<%= booking._id %>/download" class="btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Invoice
+                        </a>
+                        <a href="/listings/<%= booking.listing._id %>" class="btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15,18 9,12 15,6"/>
+                            </svg>
+                            Back to Property
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Professional Booking Confirmation Styles */
+.confirmation-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+}
+
+.confirmation-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.success-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+}
+
+.success-icon {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.success-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.025em;
+}
+
+.success-content p {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.confirmation-content {
+    padding-bottom: 3rem;
+}
+
+.booking-summary-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-header-custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.card-header-custom h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+.booking-id {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.id-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.id-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+}
+
+.card-content {
+    padding: 2rem;
+}
+
+.booking-meta {
+    margin-bottom: 2rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f8f9ff;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.meta-icon {
+    color: #667eea;
+    flex-shrink: 0;
+}
+
+.meta-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.meta-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.meta-value {
+    font-size: 1rem;
+    color: #222;
+    font-weight: 600;
+}
+
+.section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 1.5rem;
+}
+
+.section-title svg {
+    color: #667eea;
+}
+
+.property-card {
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.property-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.property-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+    line-height: 1.3;
+    flex: 1;
+}
+
+.property-price {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #e91e63;
+    white-space: nowrap;
+}
+
+.property-price span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.property-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.stay-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+
+.detail-separator {
+    color: #ccc;
+    flex-shrink: 0;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.detail-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 0.25rem;
+}
+
+.detail-day {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.guests-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.guests-icon {
+    color: #667eea;
+    flex-shrink: 0;
+}
+
+.payment-section {
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.payment-breakdown {
+    margin-bottom: 1rem;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    color: #666;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.payment-row:last-child {
+    border-bottom: none;
+}
+
+.payment-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0 0;
+    border-top: 2px solid #667eea;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.total-amount {
+    color: #e91e63;
+    font-size: 1.5rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-primary, .btn-secondary {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: white;
+    color: #666;
+    border-color: #ddd;
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    border-color: #667eea;
+    color: #667eea;
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .success-indicator {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .success-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .success-content h1 {
+        font-size: 2rem;
+    }
+    
+    .card-header-custom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .booking-id {
+        align-items: flex-start;
+        text-align: left;
+    }
+    
+    .property-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .detail-group {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .detail-separator {
+        transform: rotate(90deg);
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .confirmation-header {
+        padding: 1.5rem 0;
+    }
+    
+    .card-content {
+        padding: 1.5rem;
+    }
+    
+    .card-header-custom {
+        padding: 1.5rem;
+    }
+}
+</style>

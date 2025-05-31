@@ -1,65 +1,692 @@
 <% layout("layouts/boilerplate") %>
-<div class="row mt-3">
-    <div class="col-8 offset-2">
-        <h3>Edit Listing</h3>
-        <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required>
-                <div class="invalid-feedback">Please enter a title</div>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .edit-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 12px 40px rgba(31, 38, 135, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .edit-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 40px 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 150%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="editGrid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23editGrid)"/></svg>');
+        animation: drift 25s linear infinite;
+    }
+
+    @keyframes drift {
+        0% { transform: rotate(0deg) translateX(0px); }
+        100% { transform: rotate(360deg) translateX(15px); }
+    }
+
+    .edit-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .edit-icon {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 1.5rem;
+    }
+
+    .edit-header p {
+        margin: 12px 0 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    .edit-body {
+        padding: 40px;
+    }
+
+    .form-section {
+        margin-bottom: 36px;
+        position: relative;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 28px;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 18px 22px;
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #f8fafc;
+        color: #2d3748;
+        font-family: inherit;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #cbd5e0;
+        background: white;
+    }
+
+    textarea.form-control {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .current-image-section {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .current-image-label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .current-image {
+        max-height: 280px;
+        max-width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .current-image:hover {
+        transform: scale(1.02);
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .file-upload-container {
+        position: relative;
+        border: 2px dashed #cbd5e0;
+        border-radius: 14px;
+        padding: 40px 24px;
+        text-align: center;
+        background: #f8fafc;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-top: 16px;
+    }
+
+    .file-upload-container:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.02);
+    }
+
+    .file-upload-container.dragover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.01);
+    }
+
+    .file-upload-icon {
+        font-size: 2.5rem;
+        color: #a0aec0;
+        margin-bottom: 16px;
+    }
+
+    .file-upload-text {
+        font-size: 1.1rem;
+        color: #4a5568;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .file-upload-subtext {
+        font-size: 0.9rem;
+        color: #718096;
+    }
+
+    .file-input-hidden {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .location-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+    }
+
+    .btn-container {
+        display: flex;
+        gap: 20px;
+        justify-content: flex-end;
+        padding-top: 20px;
+        border-top: 2px solid #e2e8f0;
+        margin-top: 40px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 18px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        min-width: 160px;
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        border: 2px solid #cbd5e0;
+        color: #4a5568;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary:hover {
+        background: #cbd5e0;
+        border-color: #a0aec0;
+        transform: translateY(-1px);
+    }
+
+    .btn-primary:active, .btn-secondary:active {
+        transform: translateY(0);
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 8px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .was-validated .form-control:invalid ~ .invalid-feedback,
+    .was-validated .form-select:invalid ~ .invalid-feedback {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .was-validated .form-control:invalid,
+    .was-validated .form-select:invalid {
+        border-color: #e53e3e;
+        background: rgba(229, 62, 62, 0.05);
+    }
+
+    .was-validated .form-control:valid,
+    .was-validated .form-select:valid {
+        border-color: #38a169;
+        background: rgba(56, 161, 105, 0.05);
+    }
+
+    .form-hint {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 16px;
+        }
+        
+        .edit-body {
+            padding: 30px 24px;
+        }
+        
+        .edit-header {
+            padding: 30px 24px 24px;
+        }
+        
+        .edit-header h1 {
+            font-size: 2rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+        
+        .form-row, .location-row {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .btn-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+        }
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="container">
+    <div class="edit-card">
+        <div class="edit-header">
+            <h1>
+                <div class="edit-icon">✏️</div>
+                Edit Your Listing
+            </h1>
+            <p>Update your property details and keep your listing fresh</p>
+        </div>
+        
+        <div class="edit-body">
+            <div class="status-badge">
+                <span>📝</span>
+                Editing Mode - Make your changes below
             </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea name="listing[description]" class="form-control" required><%= listing.description %></textarea>
-                <div class="invalid-feedback">Please enter a description</div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Current Image</label>
-                <img src="<%= originalImageUrl %>" alt="listing_image" class="img-thumbnail" style="max-height: 200px;">
-            </div>
-            <div class="mb-3">
-                <label for="image" class="form-label">Upload New Image</label>
-                <input name="image" type="file" class="form-control" accept="image/*">
-            </div>
-            <div class="row">
-                <div class="mb-3 col-md-4">
-                    <label for="price" class="form-label">Price</label>
-                    <input name="listing[price]" value="<%= listing.price %>" type="number" class="form-control" required>
-                    <div class="invalid-feedback">Please enter a price</div>
+            
+            <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data" class="needs-validation" novalidate id="editForm">
+                
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">1</div>
+                        Basic Information
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title" class="form-label">Property Title</label>
+                        <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required id="title">
+                        <div class="form-hint">💡 Make it catchy and descriptive</div>
+                        <div class="invalid-feedback">Please enter a compelling title for your listing</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="listing[description]" class="form-control" required id="description"><%= listing.description %></textarea>
+                        <div class="form-hint">📝 Highlight unique features and amenities</div>
+                        <div class="invalid-feedback">Please provide a detailed description</div>
+                    </div>
                 </div>
-                <div class="mb-3 col-md-8">
-                    <label for="category" class="form-label">Category</label>
-                    <select name="listing[category]" class="form-select" required>
-                        <option value="" disabled>Select category</option>
-                        <% ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing Pools", "Camping", "Farms", "Arctic", "Boats", "Domes"].forEach(cat => { %>
-                            <option value="<%= cat %>" <%= listing.category === cat ? "selected" : "" %>><%= cat %></option>
-                        <% }) %>
-                    </select>
-                    <div class="invalid-feedback">Please select a category</div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">2</div>
+                        Photos & Media
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="current-image-section">
+                            <span class="current-image-label">Current Property Photo</span>
+                            <div class="image-overlay">Current Image</div>
+                            <img src="<%= originalImageUrl %>" alt="Current listing image" class="current-image">
+                        </div>
+                        
+                        <div class="file-upload-container" onclick="document.getElementById('imageInput').click()">
+                            <div class="file-upload-icon">📷</div>
+                            <div class="file-upload-text">Upload New Photo</div>
+                            <div class="file-upload-subtext">Click here or drag & drop to replace current image</div>
+                            <input name="image" type="file" class="file-input-hidden" accept="image/*" id="imageInput">
+                        </div>
+                        <div class="form-hint">🖼️ Optional: Leave empty to keep current image</div>
+                    </div>
                 </div>
-            </div>
-            <div class="mb-3">
-                <label for="location" class="form-label">Location</label>
-                <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required id="location-input">
-                <div class="invalid-feedback">Please enter a location</div>
-            </div>
-            <div class="mb-3">
-                <label for="country" class="form-label">Country</label>
-                <input name="listing[country]" value="<%= listing.country %>" type="text" class="form-control" required>
-                <div class="invalid-feedback">Please enter a country</div>
-            </div>
-            <button class="btn btn-dark">Save</button>
-        </form>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">3</div>
+                        Pricing & Category
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price" class="form-label">Price per Night</label>
+                            <input name="listing[price]" value="<%= listing.price %>" type="number" class="form-control" required id="price" min="0">
+                            <div class="form-hint">💰 Competitive pricing attracts more guests</div>
+                            <div class="invalid-feedback">Please enter a valid price</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category" class="form-label">Property Category</label>
+                            <select name="listing[category]" class="form-select" required id="category">
+                                <option value="" disabled>Select category</option>
+                                <% ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing Pools", "Camping", "Farms", "Arctic", "Boats", "Domes"].forEach(cat => { %>
+                                    <option value="<%= cat %>" <%= listing.category === cat ? "selected" : "" %>><%= cat %></option>
+                                <% }) %>
+                            </select>
+                            <div class="form-hint">🏷️ Help guests find your property</div>
+                            <div class="invalid-feedback">Please select a category</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">4</div>
+                        Location Details
+                    </div>
+                    
+                    <div class="location-row">
+                        <div class="form-group">
+                            <label for="location" class="form-label">Address/Location</label>
+                            <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required id="location-input">
+                            <div class="form-hint">📍 Be specific to help guests find you</div>
+                            <div class="invalid-feedback">Please enter the location</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="country" class="form-label">Country</label>
+                            <input name="listing[country]" value="<%= listing.country %>" type="text" class="form-control" required id="country">
+                            <div class="form-hint">🌍 Country name</div>
+                            <div class="invalid-feedback">Please enter the country</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <a href="/listings/<%= listing._id %>" class="btn-secondary">
+                        Cancel Changes
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
 <script>
-    console.log("Edit form loaded");
-    const form = document.querySelector('.needs-validation');
-    form.addEventListener('submit', (event) => {
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
+    (function () {
+        'use strict';
+        
+        const form = document.querySelector('.needs-validation');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const fileUpload = document.querySelector('.file-upload-container');
+        const fileInput = document.getElementById('imageInput');
+        
+        // File upload interactions
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.classList.add('dragover');
+        });
+        
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.classList.remove('dragover');
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileUploadText(files[0].name);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                updateFileUploadText(e.target.files[0].name);
+            }
+        });
+        
+        function updateFileUploadText(filename) {
+            const textEl = fileUpload.querySelector('.file-upload-text');
+            const subtextEl = fileUpload.querySelector('.file-upload-subtext');
+            textEl.textContent = `Selected: ${filename}`;
+            subtextEl.textContent = 'Click to change or drag another image';
         }
-        form.classList.add('was-validated');
-    });
+        
+        // Form validation and submission
+        form.addEventListener('submit', (event) => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Scroll to first invalid field
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                    firstInvalid.focus();
+                }
+            } else {
+                // Show loading overlay
+                loadingOverlay.style.display = 'flex';
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Real-time validation
+        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => {
+                if (input.value.trim() !== '') {
+                    input.parentElement.classList.add('was-validated');
+                }
+            });
+            
+            input.addEventListener('input', () => {
+                if (input.parentElement.classList.contains('was-validated')) {
+                    input.setCustomValidity('');
+                    if (!input.checkValidity()) {
+                        input.setCustomValidity('Invalid');
+                    }
+                }
+            });
+        });
+        
+        // Unsaved changes warning
+        let formChanged = false;
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                formChanged = true;
+            });
+        });
+        
+        window.addEventListener('beforeunload', (e) => {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+        
+        // Reset formChanged on successful submission
+        form.addEventListener('submit', () => {
+            formChanged = false;
+        });
+        
+        console.log("Professional edit form loaded successfully");
+    })();
 </script>
