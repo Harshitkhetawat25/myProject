@@ -24,9 +24,19 @@
     font-weight: bold;
     color: #fe424d !important;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   .navbar-brand:hover {
     color: #e63946 !important;
+  }
+  
+  /* Logo image styling */
+  .navbar-brand img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
   }
   
   /* Create listing button styling */
@@ -121,6 +131,14 @@
       margin-top: 6rem;
       transition: margin-top 0.3s ease;
     }
+    
+    /* Mobile logo adjustments */
+    .navbar-brand img {
+      height: 35px;
+    }
+    .navbar-brand {
+      font-size: 1.3rem;
+    }
   }
 </style>
 
@@ -128,7 +146,8 @@
   <div class="container-fluid">
     <!-- Logo/Brand -->
     <a class="navbar-brand" href="/listings">
-      <i class="fa-solid fa-home"></i> WanderWhirl
+      <img src="/images/WanderWhirl1.png" alt="WanderWhirl Logo" class ="logo" style="border-radius: 50%; height: 50px; width: 50px;">
+      WanderWhirl
     </a>
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">

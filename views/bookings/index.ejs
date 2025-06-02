@@ -35,11 +35,19 @@
                     <div class="booking-card">
                         <div class="booking-card-header">
                             <div class="property-info">
-                                <h3 class="property-title"><%= booking.listing.title %></h3>
-                                <div class="booking-status active">
-                                    <span class="status-dot"></span>
-                                    Confirmed
-                                </div>
+                                <% if (booking.listing && booking.listing.title) { %>
+                                    <h3 class="property-title"><%= booking.listing.title %></h3>
+                                    <div class="booking-status active">
+                                        <span class="status-dot"></span>
+                                        Confirmed
+                                    </div>
+                                <% } else { %>
+                                    <h3 class="property-title">Property No Longer Available</h3>
+                                    <div class="booking-status unavailable">
+                                        <span class="status-dot-unavailable"></span>
+                                        Property Removed
+                                    </div>
+                                <% } %>
                             </div>
                         </div>
                         
@@ -98,15 +106,26 @@
                         </div>
 
                         <div class="booking-actions">
-                            <a href="/bookings/<%= booking._id %>" class="btn-outline">View details</a>
-                            <a href="/bookings/<%= booking._id %>/download" class="btn-secondary">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                    <polyline points="7,10 12,15 17,10"/>
-                                    <line x1="12" y1="15" x2="12" y2="3"/>
-                                </svg>
-                                Download invoice
-                            </a>
+                            <% if (booking.listing && booking.listing.title) { %>
+                                <a href="/bookings/<%= booking._id %>" class="btn-outline">View details</a>
+                                <a href="/bookings/<%= booking._id %>/download" class="btn-secondary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7,10 12,15 17,10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    Download invoice
+                                </a>
+                            <% } else { %>
+                                <a href="/bookings/<%= booking._id %>" class="btn-outline disabled">View details</a>
+                                <a href="/listings" class="btn-secondary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9a2 2 0 0 1 2-2h.93a2 2 0 0 0 1.664-.89l.812-1.22A2 2 0 0 1 10.07 4h3.86a2 2 0 0 1 1.664.89l.812 1.22A2 2 0 0 0 18.07 7H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/>
+                                        <circle cx="12" cy="13" r="3"/>
+                                    </svg>
+                                    Find new property
+                                </a>
+                            <% } %>
                         </div>
                     </div>
                 <% }) %>
@@ -267,10 +286,22 @@
     white-space: nowrap;
 }
 
+.booking-status.unavailable {
+    background: #fee;
+    color: #c53030;
+}
+
 .status-dot {
     width: 8px;
     height: 8px;
     background: #4caf50;
+    border-radius: 50%;
+}
+
+.status-dot-unavailable {
+    width: 8px;
+    height: 8px;
+    background: #e53e3e;
     border-radius: 50%;
 }
 
@@ -345,6 +376,12 @@
     color: #667eea;
     background: #f8f9ff;
     text-decoration: none;
+}
+
+.btn-outline.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .btn-secondary {
